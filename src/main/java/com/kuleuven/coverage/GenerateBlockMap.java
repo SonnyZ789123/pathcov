@@ -3,11 +3,11 @@ package com.kuleuven.coverage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.cfg.Generator;
+import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfoByIdMap;
 import sootup.core.graph.MutableBlockControlFlowGraph;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -31,11 +31,10 @@ public class GenerateBlockMap {
 
         Map<Integer, BlockInfo> blocksById = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
 
-        Path outputPath = Path.of("out/cfg_block_map.json");
         try {
-            writeCfgBlockMap(blocksById, outputPath);
+            writeCfgBlockMap(blocksById);
         } catch (IOException e) {
-            System.err.println("❌ Failed to write CFG block mapping to " + outputPath);
+            System.err.println("❌ Failed to write CFG block map: " + e.getMessage());
             System.exit(1);
         }
     }
@@ -52,18 +51,21 @@ public class GenerateBlockMap {
         return blockInfoByIdMap.getBlocksById();
     }
 
-    private static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById, Path outputPath) throws IOException {
+    private static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById) throws IOException {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
 
+        String outputPathString = AppConfig.get("coverage.block_map.write.path");
+
+        Path outputPath = Path.of(outputPathString);
         Files.createDirectories(outputPath.getParent());
 
         try (Writer writer = Files.newBufferedWriter(outputPath)) {
             gson.toJson(blocksById, writer);
         }
 
-        System.out.println("✅ CFG block mapping written to " + outputPath);
+        System.out.println("✅ CFG block map written to " + outputPath);
     }
 
 }

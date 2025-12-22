@@ -1,10 +1,13 @@
 package com.kuleuven.cfg;
 
+import com.kuleuven.config.AppConfig;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.util.DotExporter;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class GenerateCFG {
     public static void main(String[] args) {
@@ -14,7 +17,7 @@ public class GenerateCFG {
          *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> ");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature>");
             System.exit(1);
         }
 
@@ -39,15 +42,16 @@ public class GenerateCFG {
      * @throws IOException If writing fails
      */
     private static void writeOutputs(ControlFlowGraph<?> cfg) throws IOException {
-        // Ensure output directory exists
-        (new java.io.File("out")).mkdirs();
 
-        // Write DOT graph representation
-        String filename = "out/cfg.dot";
-        try (FileWriter writer = new FileWriter(filename)) {
+        String cfgPath = AppConfig.get("cfg.write.path");
+
+        Path output = Path.of(cfgPath);
+        Files.createDirectories(output.getParent());
+
+        try (FileWriter writer = new FileWriter(output.toFile())) {
             String cfgAsDot = DotExporter.buildGraph(cfg, false, null, null);
             writer.write(cfgAsDot);
-            System.out.println("✅ DOT file written to " + filename);
+            System.out.println("✅ DOT file written to " + output);
         }
     }
 }

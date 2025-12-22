@@ -3,7 +3,7 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.coverage.GenerateCFGCoverageGraph" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples out/cfg_block_map.json $HOME/dev/master-thesis/data/coverage.out"
+mvn exec:java -Dexec.mainClass="com.kuleuven.coverage.GenerateCFGCoverageGraph" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples $HOME/dev/master-thesis/data/coverage.out"
 
 echo "✅ Done!"
 
