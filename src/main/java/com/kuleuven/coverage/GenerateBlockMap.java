@@ -1,18 +1,10 @@
 package com.kuleuven.coverage;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.kuleuven.cfg.Generator;
-import com.kuleuven.config.AppConfig;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfoByIdMap;
 import sootup.core.graph.MutableBlockControlFlowGraph;
 
 import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 
 public class GenerateBlockMap {
     public static void main(String[] args) {
@@ -29,17 +21,17 @@ public class GenerateBlockMap {
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
 
-        Map<Integer, BlockInfo> blocksById = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
+        BlockInfoByIdMap blockMap = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
 
         try {
-            writeCfgBlockMap(blocksById);
+            blockMap.dump();
         } catch (IOException e) {
             System.err.println("❌ Failed to write CFG block map: " + e.getMessage());
             System.exit(1);
         }
     }
 
-    private static Map<Integer, BlockInfo> createCfgBlockMap(String classPath, String fullyQualifiedMethodSignature) {
+    private static BlockInfoByIdMap createCfgBlockMap(String classPath, String fullyQualifiedMethodSignature) {
         Generator generator = new Generator(
                 classPath,
                 fullyQualifiedMethodSignature
@@ -47,25 +39,6 @@ public class GenerateBlockMap {
 
         MutableBlockControlFlowGraph cfg = (MutableBlockControlFlowGraph) generator.getCfg();
 
-        BlockInfoByIdMap blockInfoByIdMap = new BlockInfoByIdMap(generator.method, cfg);
-        return blockInfoByIdMap.getBlocksById();
+        return new BlockInfoByIdMap(generator.method, cfg);
     }
-
-    private static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById) throws IOException {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
-
-        String outputPathString = AppConfig.get("coverage.block_map.write.path");
-
-        Path outputPath = Path.of(outputPathString);
-        Files.createDirectories(outputPath.getParent());
-
-        try (Writer writer = Files.newBufferedWriter(outputPath)) {
-            gson.toJson(blocksById, writer);
-        }
-
-        System.out.println("✅ CFG block map written to " + outputPath);
-    }
-
 }

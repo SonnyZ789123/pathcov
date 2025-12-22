@@ -8,7 +8,6 @@ import com.kuleuven.coverage.CoverageAgent.util.CoverageCount;
 import com.kuleuven.coverage.graph.CoverageGraph;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import sootup.core.graph.ControlFlowGraph;
-import sootup.core.util.DotExporter;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -32,14 +31,12 @@ public class GenerateCFGCoverageGraph {
         String classPath = args[0];
         String blockCoverageMapPath = args[1];
 
-        String blockMapPath = AppConfig.get("coverage.block_map.write.path");
-
         Map<Integer, BlockInfo> blockMap = null;
 
         try {
-            blockMap = BlockInfoByIdMap.readFromJson(blockMapPath);
+            blockMap = BlockInfoByIdMap.readFromJson();
         } catch (IOException e) {
-            System.err.println("❌ Failed to load block map from path " + blockMapPath);
+            System.err.println("❌ Failed to load block map: " + e.getMessage());
             System.exit(1);
         }
 
