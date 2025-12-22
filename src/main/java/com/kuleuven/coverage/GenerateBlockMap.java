@@ -12,19 +12,21 @@ public class GenerateBlockMap {
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
          *   1: fully-qualified method signature (e.g., "<com.kuleuven._examples.Foo: int foo(int)>")
+         *   2: outputPath            (e.g., "./output/block_map.json")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature>");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> [outputPath]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
+        String outputPath = args.length >= 3 ? args[2] : null;
 
         BlockInfoByIdMap blockMap = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
 
         try {
-            blockMap.dump();
+            blockMap.dump(outputPath);
         } catch (IOException e) {
             System.err.println("❌ Failed to write CFG block map: " + e.getMessage());
             System.exit(1);
