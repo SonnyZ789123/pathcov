@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.CoverageAgent.StmtId;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
+import org.jspecify.annotations.Nullable;
 import sootup.core.graph.BasicBlock;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -56,25 +57,27 @@ public final class BlockInfoByIdMap {
         return blocksById;
     }
 
-    public static Map<Integer, BlockInfo> readFromJson() throws IOException {
+    public static Map<Integer, BlockInfo> readFromJson(@Nullable String optionalBlockMapPath) throws IOException {
         Gson gson = new Gson();
         Type type = new TypeToken<Map<Integer, BlockInfo>>() {}.getType();
+
+        String blockMapPath = optionalBlockMapPath != null ? optionalBlockMapPath : outputPathString;
 
         try (InputStreamReader reader =
                      new InputStreamReader(
                              java.nio.file.Files.newInputStream(
-                                     java.nio.file.Path.of(outputPathString)))) {
+                                     java.nio.file.Path.of(blockMapPath)))) {
 
             return gson.fromJson(reader, type);
         }
     }
 
-    public void dump() throws IOException {
+    public void dump(@Nullable String optionalOutputPathString) throws IOException {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
 
-        Path outputPath = Path.of(outputPathString);
+        Path outputPath = Path.of(optionalOutputPathString != null ? optionalOutputPathString : outputPathString);
         Files.createDirectories(outputPath.getParent());
 
         try (Writer writer = Files.newBufferedWriter(outputPath)) {

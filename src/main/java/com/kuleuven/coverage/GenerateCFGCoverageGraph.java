@@ -22,19 +22,21 @@ public class GenerateCFGCoverageGraph {
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
          *   1: blockCoverageMapPath   (e.g., "out/coverage.out")
+         *   2: blockMapPath           (e.g., "./output/block_map.json")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <blockCoverageMapPath>");
+            System.out.println("Expects args <classPath> <blockCoverageMapPath> [blockMapPath]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String blockCoverageMapPath = args[1];
+        String blockMapPath = args.length >= 3 ? args[2] : null;
 
         Map<Integer, BlockInfo> blockMap = null;
 
         try {
-            blockMap = BlockInfoByIdMap.readFromJson();
+            blockMap = BlockInfoByIdMap.readFromJson(blockMapPath);
         } catch (IOException e) {
             System.err.println("❌ Failed to load block map: " + e.getMessage());
             System.exit(1);
