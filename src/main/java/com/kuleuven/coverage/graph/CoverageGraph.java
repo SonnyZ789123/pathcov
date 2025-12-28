@@ -94,7 +94,7 @@ public class CoverageGraph {
                     if (destinationBlockNode == null) {
                         destinationBlockNode = new CoverageNode(
                                 successorBlockInfo,
-                                currBlock,
+                                cfg.getBlockOf(successor),
                                 blockIdToCoverageCount.getOrDefault(successorBlockInfo.blockId(), 0));
                         seenBlocks.put(successorBlockInfo.blockId(), destinationBlockNode);
                         graphBuilder.addNode(destinationBlockNode);
