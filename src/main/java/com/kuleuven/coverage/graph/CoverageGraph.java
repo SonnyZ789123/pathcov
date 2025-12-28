@@ -4,14 +4,13 @@ import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.StmtId;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
 import sootup.core.graph.ControlFlowGraph;
-import sootup.core.graph.MutableBlockControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CoverageGraph extends MutableBlockControlFlowGraph {
+public class CoverageGraph {
     private final ControlFlowGraph<?> cfg;
     private final Map<Integer, Integer> blockIdToCoverageCount;
     private final Map<Integer, BlockInfo> blocksById;
@@ -29,6 +28,10 @@ public class CoverageGraph extends MutableBlockControlFlowGraph {
         fillBlockInfoByStmtId();
 
         this.graph = createGraph(cfg);
+    }
+
+    public ControlFlowGraph<?> getCfg() {
+        return cfg;
     }
 
     public PropertyGraph getGraph() {
