@@ -9,13 +9,13 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 
 public class CoverageEdge extends PropertyGraphEdge {
     private final AbstCfgEdge internalCfgEdge;
-    private final int branchIndex;
+    private final int successorIndex;
 
-    public CoverageEdge(CoverageNode sourceNode, CoverageNode destinationNode, AbstCfgEdge internalCfgEdge, int branchIndex) {
+    public CoverageEdge(CoverageNode sourceNode, CoverageNode destinationNode, AbstCfgEdge internalCfgEdge, int successorIndex) {
         super(sourceNode, destinationNode);
 
         this.internalCfgEdge = internalCfgEdge;
-        this.branchIndex = branchIndex;
+        this.successorIndex = successorIndex;
     }
 
     @Override public CoverageNode getSource() {
@@ -31,8 +31,23 @@ public class CoverageEdge extends PropertyGraphEdge {
         return this.internalCfgEdge.getLabel();
     }
 
+    public int getSuccessorIndex() {
+        return successorIndex;
+    }
+
+    /**
+     * Returns the branch index that is compatible and shared with JDart representation.
+     *
+     * @return the branch index compatible with JDart
+     */
     public int getBranchIndex() {
-        return branchIndex;
+        if (this.internalCfgEdge instanceof IfTrueCfgEdge) {
+            return 0;
+        } else if (this.internalCfgEdge instanceof IfFalseCfgEdge) {
+            return 1;
+        } else {
+            return getSuccessorIndex();
+        }
     }
 
     public static CoverageEdge exceptionalEdge(
