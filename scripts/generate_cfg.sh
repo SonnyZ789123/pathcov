@@ -3,7 +3,7 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.cfg.GenerateCFG" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.ControlFlowGraph.Test: int foo(int)>\""
+mvn exec:java -Dexec.mainClass="com.kuleuven.cfg.GenerateCFG" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.branches.Test: int foo(int, int, test.branches.Test\$Mode)>\""
 
 echo "✅ Done!"
 

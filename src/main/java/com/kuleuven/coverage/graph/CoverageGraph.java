@@ -2,6 +2,7 @@ package com.kuleuven.coverage.graph;
 
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.StmtId;
+import com.kuleuven.coverage.graph.util.CoverageGraphToJsonConverter;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -47,6 +48,10 @@ public class CoverageGraph {
     private BlockInfo findBlockInfoByStmt(Stmt stmt) {
         String stmtId = StmtId.getStmtId(stmt);
         return blockInfoByStmtId.get(stmtId);
+    }
+
+    public String toJson() {
+        return CoverageGraphToJsonConverter.convert(this);
     }
 
     /**
