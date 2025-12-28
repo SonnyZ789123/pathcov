@@ -7,4 +7,17 @@ public record BlockInfo(
         String methodDescriptor,
         String stmtId,
         int lineNumber
-) {}
+) {
+    @Override
+
+    public String toString() {
+        return "BlockInfo{" +
+                "blockId=" + blockId +
+                ", className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", methodDescriptor='" + methodDescriptor + '\'' +
+                ", stmtId='" + stmtId + '\'' +
+                ", lineNumber=" + lineNumber +
+                '}';
+    }
+}

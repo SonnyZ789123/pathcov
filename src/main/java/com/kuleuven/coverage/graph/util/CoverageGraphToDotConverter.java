@@ -37,7 +37,7 @@ public class CoverageGraphToDotConverter {
                         .thenComparing(CoverageEdge::getLabel)).toList()) {
             String sourceId = String.valueOf(edge.getSource().getBlockInfo().blockId());
             String destinationId = String.valueOf(edge.getDestination().getBlockInfo().blockId());
-            String label = escapeDot(edge.getLabel());
+            String label = edge.getBranchIndex() + ": " + escapeDot(edge.getLabel());
             String color = getEdgeColor(edge);
             builder.append(String.format("\t\"%s\" -> \"%s\"[label=\"%s\", color=\"%s\", fontcolor=\"%s\"];\n", sourceId, destinationId, label, color, color));
         }
@@ -51,7 +51,7 @@ public class CoverageGraphToDotConverter {
     }
 
     private static String getNodeLabel(CoverageNode node) {
-        String stmt = escapeDot(node.getBlock().getHead().toString());
+        String stmt = escapeDot(node.getBlock().getTail().toString());
         int hits = node.getCoverageCount();
 
         return String.format("{%s|hits=%d}", stmt, hits);

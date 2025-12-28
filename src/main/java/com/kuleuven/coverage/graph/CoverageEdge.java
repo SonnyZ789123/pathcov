@@ -9,11 +9,13 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 
 public class CoverageEdge extends PropertyGraphEdge {
     private final AbstCfgEdge internalCfgEdge;
+    private final int branchIndex;
 
-    public CoverageEdge(CoverageNode sourceNode, CoverageNode destinationNode, AbstCfgEdge internalCfgEdge) {
+    public CoverageEdge(CoverageNode sourceNode, CoverageNode destinationNode, AbstCfgEdge internalCfgEdge, int branchIndex) {
         super(sourceNode, destinationNode);
 
         this.internalCfgEdge = internalCfgEdge;
+        this.branchIndex = branchIndex;
     }
 
     @Override public CoverageNode getSource() {
@@ -29,6 +31,10 @@ public class CoverageEdge extends PropertyGraphEdge {
         return this.internalCfgEdge.getLabel();
     }
 
+    public int getBranchIndex() {
+        return branchIndex;
+    }
+
     public static CoverageEdge exceptionalEdge(
             CoverageNode sourceNode,
             CoverageNode destinationNode) {
@@ -37,7 +43,7 @@ public class CoverageEdge extends PropertyGraphEdge {
 
         AbstCfgEdge internalEdge = new ExceptionalCfgEdge(source, destination);
 
-        return new CoverageEdge(sourceNode, destinationNode, internalEdge);
+        return new CoverageEdge(sourceNode, destinationNode, internalEdge, -1);
     }
 
     public static CoverageEdge of(
@@ -54,7 +60,7 @@ public class CoverageEdge extends PropertyGraphEdge {
                 source,
                 destination);
 
-        return new CoverageEdge(sourceNode, destinationNode, internalEdge);
+        return new CoverageEdge(sourceNode, destinationNode, internalEdge, successorIndex);
     }
 
     /**
