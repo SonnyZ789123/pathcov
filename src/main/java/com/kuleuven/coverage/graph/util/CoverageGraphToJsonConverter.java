@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CoverageGraphToJsonConverter {
-    private record Node(String id, String label, double weight) {}
+    private record Node(String id, String label, boolean covered, double weight) {}
 
     private record Edge(String from, String to, String label, double weight, Integer branchIdx) {}
 
@@ -34,6 +34,7 @@ public class CoverageGraphToJsonConverter {
                     Node jsonNode = new Node(
                             String.valueOf(node.getBlockInfo().blockId()),
                             node.getBlock().getTail().toString(),
+                            node.getCoverageCount() > 0,
                             node.getCoverageCount()
                     );
 
