@@ -1,17 +1,42 @@
 package com.kuleuven.coverage.CoverageAgent.shared;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import com.google.gson.Gson;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Out {
-    public static List<int[]> get(String outputPath) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(outputPath));
+    private final List<CoveragePath> coveragePaths;
 
-        @SuppressWarnings("unchecked")
-        List<int[]> executionPaths = (List<int[]>) ois.readObject();
+    public Out(String outputPath) throws IOException, ClassNotFoundException {
+        Gson gson = new Gson();
 
-        return executionPaths;
+        try (Reader r = Files.newBufferedReader(Path.of(outputPath))) {
+            CoverageDump dump = gson.fromJson(r, CoverageDump.class);
+            this.coveragePaths = dump.paths;
+        }
+    }
+
+    public List<CoveragePath> get() {
+        return coveragePaths;
+    }
+
+    public List<int[]> getBlockPaths() {
+        List<int[]> blockPaths = new ArrayList<>();
+        for (CoveragePath coveragePath : coveragePaths) {
+            blockPaths.add(coveragePath.blockPath);
+        }
+        return blockPaths;
+    }
+
+    public List<int[]> getInstructionPaths() {
+        List<int[]> instructionPaths = new ArrayList<>();
+        for (CoveragePath coveragePath : coveragePaths) {
+            instructionPaths.add(coveragePath.instructionPath);
+        }
+        return instructionPaths;
     }
 }

@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Set;
 
 public final class CoverageCount {
-    public static Map<Integer, Integer> getByBlockId(List<int[]> executionPaths) {
+    public static Map<Integer, Integer> getByBlockId(List<int[]> blockPaths) {
         Map<Integer, Integer> coverageCounts = new HashMap<>();
         // Per execution path, count each blockId only once to remove duplicates due to loops
-        for (int[] path : executionPaths) {
+        for (int[] path : blockPaths) {
             Set<Integer> seenInPath = new HashSet<>();
             for (int blockId : path) {
                 if (seenInPath.add(blockId)) {
