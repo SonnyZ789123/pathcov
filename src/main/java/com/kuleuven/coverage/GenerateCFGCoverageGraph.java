@@ -43,9 +43,10 @@ public class GenerateCFGCoverageGraph {
         }
 
         try {
-            List<int[]> executionPaths = Out.get(blockCoverageMapPath);
+            Out out = new Out(blockCoverageMapPath);
+            List<int[]> blockPaths = out.getBlockPaths();
 
-            Map<Integer, Integer> coverageCounts = CoverageCount.getByBlockId(executionPaths);
+            Map<Integer, Integer> coverageCounts = CoverageCount.getByBlockId(blockPaths);
 
             Collection<String> fullyQualifiedMethodSignatures = extractMethodSignatures(blockMap.values());
 

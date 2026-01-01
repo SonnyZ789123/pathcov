@@ -7,7 +7,6 @@ import com.kuleuven.coverage.CoverageAgent.shared.Out;
 import com.kuleuven.coverage.CoverageAgent.util.CoverageCount;
 import com.kuleuven.coverage.graph.CoverageGraph;
 import sootup.core.graph.ControlFlowGraph;
-import sootup.core.jimple.common.stmt.Stmt;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -31,7 +30,8 @@ public class Main {
         }
 
         try {
-            List<int[]> executionPaths = Out.get(blockCoverageMapPath);
+            Out out = new Out(blockCoverageMapPath);
+            List<int[]> executionPaths = out.getBlockPaths();
 
             Map<Integer, Integer> coverageCounts = CoverageCount.getByBlockId(executionPaths);
 
