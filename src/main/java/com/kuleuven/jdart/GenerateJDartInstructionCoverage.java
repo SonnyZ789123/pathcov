@@ -77,9 +77,7 @@ public class GenerateJDartInstructionCoverage {
         }
 
         Files.createDirectories(outputPath.getParent());
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+        Gson gson = new GsonBuilder().create();
 
         try (FileWriter writer = new FileWriter(outputPath.toFile())) {
             writer.write(gson.toJson(instructionPathsByMethod));
