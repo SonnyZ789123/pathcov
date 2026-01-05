@@ -79,7 +79,7 @@ public class GenerateCFGCoverageGraph {
 
         try (FileWriter writer = new FileWriter(outputPath.toFile())) {
             writer.write(coverageGraph.getGraph().toDotGraph());
-            System.out.println("✅ DOT file written to " + outputPath);
+            System.out.println("✅ Coverage graph DOT file written to " + outputPath);
         }
 
         String rankingOutputPathPrefix = AppConfig.get("coverage.graph.jdart.write.path_prefix");
@@ -91,7 +91,7 @@ public class GenerateCFGCoverageGraph {
 
         try (FileWriter writer = new FileWriter(rankingOutputPath.toFile())) {
             writer.write(coverageGraph.toJson());
-            System.out.println("✅ DOT file written to " + rankingOutputPath);
+            System.out.println("✅ Coverage graph JSON file written to " + rankingOutputPath);
         }
     }
 }
