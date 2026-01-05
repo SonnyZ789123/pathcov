@@ -37,17 +37,27 @@ public class CoverageGraphToDotConverter {
                         .thenComparing(CoverageEdge::getLabel)).toList()) {
             String sourceId = String.valueOf(edge.getSource().getBlockInfo().blockId());
             String destinationId = String.valueOf(edge.getDestination().getBlockInfo().blockId());
-            String label = edge.getBranchIndex() + ": " + escapeDot(edge.getLabel());
+            String label = edge.getBranchIndex() + ": " + simplifyEdgeLabel(escapeDot(edge.getLabel()));
             String color = getEdgeColor(edge);
-            builder.append(String.format("\t\"%s\" -> \"%s\"[label=\"%s\", color=\"%s\", fontcolor=\"%s\"];\n", sourceId, destinationId, label, color, color));
+            builder.append(String.format("\t\"%s\" -> \"%s\"[label=\"%s\", color=\"%s\", fontcolor=\"%s\"];\n",
+                    sourceId, destinationId, label, color, color));
         }
 
         builder.append("}\n");
         return builder.toString();
     }
 
+    private static String simplifyEdgeLabel(String label) {
+        return label.replace("cfg_", "");
+    }
+
     private static String escapeDot(String label) {
-        return label.replace("\"", "\\\"").replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}");
+        return label
+                .replace("\"", "\\\"")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("{", "\\{")
+                .replace("}", "\\}");
     }
 
     private static String getNodeLabel(CoverageNode node) {
@@ -61,7 +71,7 @@ public class CoverageGraphToDotConverter {
         int hits = node.getCoverageCount();
 
         if (hits == 0) {
-            return "indianred1";
+            return "lightcoral";
         } else if (hits <= 2) {
             return "khaki1";
         } else {
