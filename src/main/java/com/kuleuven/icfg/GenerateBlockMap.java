@@ -1,14 +1,11 @@
-package com.kuleuven.coverage;
+package com.kuleuven.icfg;
 
 import com.kuleuven.cg.SootUpCGWrapper;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
-import com.kuleuven.icfg.Generator;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
-import sootup.core.graph.ControlFlowGraph;
 import sootup.core.model.SootMethod;
 import sootup.core.signatures.MethodSignature;
-import sootup.java.core.JavaSootMethod;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GenerateICFGBlockMap {
+public class GenerateBlockMap {
     public static void main(String[] args) {
         /*
          * Expected arguments:
