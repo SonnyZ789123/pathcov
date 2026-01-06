@@ -1,10 +1,11 @@
-package com.kuleuven.coverage.CoverageAgent;
+package com.kuleuven.coverage.CoverageAgent.shared;
 
 import sootup.core.jimple.common.stmt.Stmt;
 
 public final class StmtId {
     /**
      * Get a unique identifier inside a method for a statement based on its position and string representation.
+     * Because this includes the stmt position info, it should be unique over multiple methods.
      * @param stmt The statement to identify.
      * @return A unique identifier string for the statement.
      */
