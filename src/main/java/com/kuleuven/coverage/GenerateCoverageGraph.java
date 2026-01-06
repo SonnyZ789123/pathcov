@@ -21,7 +21,7 @@ public class GenerateCoverageGraph {
         /*
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
-         *   1: blockCoverageMapPath   (e.g., "out/coverage.out")
+         *   1: blockCoverageMapPath   (e.g., "out/coverage.json")
          *   2: blockMapPath           (e.g., "./output/block_map.json")
          */
         if (args.length < 2) {
