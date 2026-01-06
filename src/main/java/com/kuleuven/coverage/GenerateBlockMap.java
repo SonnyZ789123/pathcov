@@ -1,10 +1,10 @@
 package com.kuleuven.coverage;
 
 import com.kuleuven.cfg.Generator;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfoByIdMap;
-import sootup.core.graph.MutableBlockControlFlowGraph;
+import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
 
 import java.io.IOException;
+import java.util.List;
 
 public class GenerateBlockMap {
     public static void main(String[] args) {
@@ -39,8 +39,6 @@ public class GenerateBlockMap {
                 fullyQualifiedMethodSignature
         );
 
-        MutableBlockControlFlowGraph cfg = (MutableBlockControlFlowGraph) generator.getCfg();
-
-        return new BlockInfoByIdMap(generator.method, cfg);
+        return new BlockInfoByIdMap(List.of(generator.method));
     }
 }

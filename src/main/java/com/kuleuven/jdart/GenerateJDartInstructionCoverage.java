@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfoByIdMap;
 import com.kuleuven.coverage.CoverageAgent.shared.Out;
+import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
 

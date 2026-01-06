@@ -1,10 +1,11 @@
-package com.kuleuven.coverage.CoverageAgent.shared;
+package com.kuleuven.icfg.CoverageAgent.shared;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.CoverageAgent.StmtId;
+import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
 import sootup.core.graph.BasicBlock;
@@ -19,37 +20,40 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class BlockInfoByIdMap {
-    private final SootMethod method;
-    private final ControlFlowGraph<?> cfg;
+    private final List<SootMethod> methods;
     private final Map<Integer, BlockInfo> blocksById = new LinkedHashMap<>();
-    private static final String outputPathString = AppConfig.get("coverage.block_map.write.path");
+    private static final String outputPathString = AppConfig.get("icfg.block_map.write.path");
 
-    public BlockInfoByIdMap(SootMethod method, ControlFlowGraph<?> cfg) {
-        this.method = method;
-        this.cfg = cfg;
+    public BlockInfoByIdMap(List<SootMethod> methods) {
+        this.methods = methods;
         init();
     }
 
     private void init() {
         int nextId = 0;
-        for (BasicBlock<?> block : cfg.getBlocks()) {
-            Stmt entry = block.getHead();
+        for (SootMethod method : methods) {
+            ControlFlowGraph<?> cfg = method.getBody().getControlFlowGraph();
 
-            int lineNumber = entry.getPositionInfo().getStmtPosition().getFirstLine();
+            for (BasicBlock<?> block : cfg.getBlocks()) {
+                Stmt entry = block.getHead();
 
-            BlockInfo info = new BlockInfo(
-                    nextId,
-                    method.getDeclaringClassType().getFullyQualifiedName(),
-                    method.getName(),
-                    SootMethodEncoder.toJvmMethodDescriptor(method),
-                    StmtId.getStmtId(entry),
-                    lineNumber
-            );
+                int lineNumber = entry.getPositionInfo().getStmtPosition().getFirstLine();
 
-            blocksById.put(nextId++, info);
+                BlockInfo info = new BlockInfo(
+                        nextId,
+                        method.getDeclaringClassType().getFullyQualifiedName(),
+                        method.getName(),
+                        SootMethodEncoder.toJvmMethodDescriptor(method),
+                        StmtId.getStmtId(entry),
+                        lineNumber
+                );
+
+                blocksById.put(nextId++, info);
+            }
         }
     }
 
@@ -84,6 +88,7 @@ public final class BlockInfoByIdMap {
             gson.toJson(this.blocksById, writer);
         }
 
-        System.out.println("✅ CFG block map written to " + outputPath);
+        System.out.println("✅ ICFG block map written to " + outputPath);
     }
 }
+

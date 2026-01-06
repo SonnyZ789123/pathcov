@@ -2,7 +2,7 @@ package com.kuleuven.coverage;
 
 import com.kuleuven.cfg.Generator;
 import com.kuleuven.config.AppConfig;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfoByIdMap;
+import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
 import com.kuleuven.coverage.CoverageAgent.shared.Out;
 import com.kuleuven.coverage.CoverageAgent.util.CoverageCount;
 import com.kuleuven.coverage.graph.CoverageGraph;
