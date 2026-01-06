@@ -16,7 +16,7 @@ import java.util.*;
 
 import static com.kuleuven.coverage.CoverageAgent.util.BlockInfoUtil.extractMethodSignatures;
 
-public class GenerateCFGCoverageGraph {
+public class GenerateCoverageGraph {
     public static void main(String[] args) {
         /*
          * Expected arguments:
