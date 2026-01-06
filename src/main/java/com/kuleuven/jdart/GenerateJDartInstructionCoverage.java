@@ -24,7 +24,7 @@ public class GenerateJDartInstructionCoverage {
     public static void main(String[] args) {
         /*
          * Expected arguments:
-         *   0: coveragePathsOutputPath              (e.g., "./out/coverage.out")
+         *   0: coveragePathsOutputPath              (e.g., "./out/coverage.json")
          *   1: blockMapPath                         (e.g., "./out/cfg_block_map.json")
          *   2: outputPath                           (e.g., "./out/jdart_instruction_paths.json")
          */
@@ -50,12 +50,13 @@ public class GenerateJDartInstructionCoverage {
             List<int[]> executionPaths = out.getInstructionPaths();
 
             Collection<String> fullyQualifiedMethodSignatures = extractMethodSignatures(blockMap.values());
-            String methodSignature = fullyQualifiedMethodSignatures.iterator().next();
 
-            Map<String, List<int[]>> instructionPathsByMethod = new HashMap<>();
-            instructionPathsByMethod.put(SootMethodEncoder.toJvmMethodFullName(methodSignature), executionPaths);
+            for (String methodSignature : fullyQualifiedMethodSignatures) {
+                Map<String, List<int[]>> instructionPathsByMethod = new HashMap<>();
+                instructionPathsByMethod.put(SootMethodEncoder.toJvmMethodFullName(methodSignature), executionPaths);
 
-            writeOutputs(instructionPathsByMethod, outputPath);
+                writeOutputs(instructionPathsByMethod, outputPath);
+            }
         } catch (IOException e) {
                 System.err.println("❌ Failed to read block coverage map from path " + coveragePathsOutputPath);
                 System.exit(1);
