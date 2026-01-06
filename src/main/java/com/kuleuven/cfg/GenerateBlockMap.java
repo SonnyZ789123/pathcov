@@ -1,11 +1,14 @@
-package com.kuleuven.coverage;
+package com.kuleuven.cfg;
 
-import com.kuleuven.cfg.Generator;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Generate the block map for a single CFG.
+ * @deprecated Not maintained anymore. Use the ICFG module instead.
+ */
 public class GenerateBlockMap {
     public static void main(String[] args) {
         /*
