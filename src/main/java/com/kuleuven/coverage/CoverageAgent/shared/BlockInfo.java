@@ -1,6 +1,7 @@
 package com.kuleuven.coverage.CoverageAgent.shared;
 
 public record BlockInfo(
+        // The unique identifier of the block, a block id is unique across multiple methods.
         int blockId,
         String className,
         String methodName,

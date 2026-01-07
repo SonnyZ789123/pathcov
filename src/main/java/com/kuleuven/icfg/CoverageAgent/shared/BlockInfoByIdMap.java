@@ -43,6 +43,7 @@ public final class BlockInfoByIdMap {
 
                 int lineNumber = entry.getPositionInfo().getStmtPosition().getFirstLine();
 
+                // The block id should be unique across all methods.
                 BlockInfo info = new BlockInfo(
                         nextId,
                         method.getDeclaringClassType().getFullyQualifiedName(),

@@ -3,60 +3,41 @@ package com.kuleuven.jdart;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.config.AppConfig;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.shared.Out;
-import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
-import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.kuleuven.coverage.CoverageAgent.util.BlockInfoUtil.extractMethodSignatures;
 
 public class GenerateJDartInstructionCoverage {
     public static void main(String[] args) {
         /*
          * Expected arguments:
          *   0: coveragePathsOutputPath              (e.g., "./out/coverage.json")
-         *   1: blockMapPath                         (e.g., "./out/cfg_block_map.json")
-         *   2: outputPath                           (e.g., "./out/jdart_instruction_paths.json")
+         *   1: outputPath                           (e.g., "./out/jdart_instruction_paths.json")
          */
-        if (args.length < 2) {
-            System.out.println("Expects args <coveragePathsOutputPath> <blockMapPath> [outputPath]");
+        if (args.length < 1) {
+            System.out.println("Expects args <coveragePathsOutputPath> [outputPath]");
             System.exit(1);
         }
 
         String coveragePathsOutputPath = args[0];
-        String blockMapPath = args[1];
-        String outputPath = args.length >= 3 ? args[2] : null;
-
-        Map<Integer, BlockInfo> blockMap = null;
-        try {
-            blockMap = BlockInfoByIdMap.readFromJson(blockMapPath);
-        } catch (IOException e) {
-            System.err.println("❌ Failed to load block map: " + e.getMessage());
-            System.exit(1);
-        }
+        String outputPath = args.length >= 2 ? args[1] : null;
 
         try {
             Out out = new Out(coveragePathsOutputPath);
-            List<int[]> executionPaths = out.getInstructionPaths();
 
-            Collection<String> fullyQualifiedMethodSignatures = extractMethodSignatures(blockMap.values());
-
-            for (String methodSignature : fullyQualifiedMethodSignatures) {
-                Map<String, List<int[]>> instructionPathsByMethod = new HashMap<>();
-                instructionPathsByMethod.put(SootMethodEncoder.toJvmMethodFullName(methodSignature), executionPaths);
-
-                writeOutputs(instructionPathsByMethod, outputPath);
+            Map<String, List<int[]>> instructionPathsByMethod = new HashMap<>();
+            // ASM method full name is something like: com.kuleuven._examples.Foo.bar(I)I
+            for (String methodFullName : out.getMethodFullNames()) {
+                instructionPathsByMethod.put(methodFullName, out.getInstructionPaths(methodFullName));
             }
+            writeOutputs(instructionPathsByMethod, outputPath);
         } catch (IOException e) {
                 System.err.println("❌ Failed to read block coverage map from path " + coveragePathsOutputPath);
                 System.exit(1);
@@ -70,7 +51,7 @@ public class GenerateJDartInstructionCoverage {
             Map<String, List<int[]>> instructionPathsByMethod,
             @Nullable String outputPathString
     ) throws IOException {
-        Path outputPath = null;
+        Path outputPath;
         if (outputPathString != null) {
             outputPath = Path.of(outputPathString);
         } else {
