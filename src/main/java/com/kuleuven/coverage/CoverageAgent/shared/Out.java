@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public final class Out {
-    private final List<CoveragePath> coveragePaths;
+    private final List<ExecutionCoveragePath> coveragePaths;
     private final Set<String> methodFullNames;
 
     public Out(String outputPath) throws IOException, ClassNotFoundException {
@@ -19,16 +20,16 @@ public final class Out {
 
         try (Reader r = Files.newBufferedReader(Path.of(outputPath))) {
             CoverageDump dump = gson.fromJson(r, CoverageDump.class);
-            this.coveragePaths = dump.paths;
+            this.coveragePaths = dump.executionPaths;
             this.methodFullNames = extractMethodFullNames();
         }
     }
 
     private Set<String> extractMethodFullNames() {
         Set<String> methodFullNames = new HashSet<>();
-        for (CoveragePath coveragePath : coveragePaths) {
+        forEachCoveragePath(coveragePath -> {
             methodFullNames.add(coveragePath.methodFullName);
-        }
+        });
         return methodFullNames;
     }
 
@@ -43,7 +44,7 @@ public final class Out {
      */
     public List<int[]> getBlockPaths() {
         List<int[]> blockPaths = new ArrayList<>();
-        coveragePaths.forEach(coveragePath -> {
+        forEachCoveragePath(coveragePath -> {
             blockPaths.add(coveragePath.blockPath);
         });
         return blockPaths;
@@ -51,11 +52,18 @@ public final class Out {
 
     public List<int[]> getInstructionPaths(String methodFullName) {
         List<int[]> instructionPaths = new ArrayList<>();
-        coveragePaths.forEach(coveragePath -> {
+        forEachCoveragePath(coveragePath -> {
             if (coveragePath.methodFullName.equals(methodFullName)) {
                 instructionPaths.add(coveragePath.instructionPath);
             }
         });
         return instructionPaths;
+    }
+
+    // Currently we don't have any use case for knowing the entry method, so we flatmap it.
+    private void forEachCoveragePath(Consumer<CoveragePath> consumer) {
+        coveragePaths.forEach(executionCoveragePath -> {
+            executionCoveragePath.coveragePaths.forEach(consumer);
+        });
     }
 }
