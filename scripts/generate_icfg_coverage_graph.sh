@@ -3,7 +3,7 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.coverage.GenerateICFGCoverageGraph" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.nested.Test: int bar(int)>\" $HOME/dev/master-thesis/data/coverage_paths.json"
+mvn exec:java -Dexec.mainClass="com.kuleuven.icfg.coverage.GenerateCoverageGraph" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.nested.Test: int bar(int)>\" $HOME/dev/master-thesis/data/coverage_paths.json"
 
 echo "✅ Done!"
 
