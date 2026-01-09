@@ -41,9 +41,6 @@ public class GenerateJDartInstructionCoverage {
         } catch (IOException e) {
                 System.err.println("❌ Failed to read block coverage map from path " + coveragePathsOutputPath);
                 System.exit(1);
-        } catch (ClassNotFoundException e) {
-            System.err.println("❌ Failed to deserialize block coverage map: " + e.getMessage());
-            System.exit(1);
         }
     }
 

@@ -15,7 +15,7 @@ public final class Out {
     private final List<ExecutionCoveragePath> coveragePaths;
     private final Set<String> methodFullNames;
 
-    public Out(String outputPath) throws IOException, ClassNotFoundException {
+    public Out(String outputPath) throws IOException {
         Gson gson = new Gson();
 
         try (Reader r = Files.newBufferedReader(Path.of(outputPath))) {
