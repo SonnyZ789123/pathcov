@@ -9,8 +9,8 @@ echo "✅ Done!"
 
 echo "--- GENERATE SVG DOT FILE ---"
 
-dot -Tsvg out/icfg.dot -o out/icfg.svg
+dot -Tsvg out/visualization/icfg/icfg.dot -o out/visualization/icfg/icfg.svg
 
-open out/icfg.svg
+open out/visualization/icfg/icfg.svg
 
 echo "✅ Done!"

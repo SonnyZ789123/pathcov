@@ -7,10 +7,16 @@ mvn exec:java -Dexec.mainClass="com.kuleuven.cfg.coverage.GenerateCoverageGraph"
 
 echo "✅ Done!"
 
-echo "--- GENERATE SVG FROM DOT FILE ---"
+echo "====== Generating SVGs from DOT files ======"
 
-dot -Tsvg out/visualization/cfg_coverage0.dot -o out/visualization/svg/cfg_coverage0.svg
+# See application.properties in pathcov repository for output dir
+COVERAGE_DIR="$HOME/dev/master-thesis/pathcov/out/visualization/cfg/coverage"
+DOT_DIR="$COVERAGE_DIR/dot"
+SVG_DIR="$COVERAGE_DIR/svg"
+mkdir -p "$SVG_DIR"
 
-open out/visualization/svg/cfg_coverage0.svg
-
-echo "✅ Done!"
+for dot_file in "$DOT_DIR"/*.dot; do
+  base=$(basename "$dot_file" .dot)
+  dot -Tsvg "$dot_file" -o "$SVG_DIR/$base.svg"
+  echo "✅ Generated $SVG_DIR/$base.svg"
+done
