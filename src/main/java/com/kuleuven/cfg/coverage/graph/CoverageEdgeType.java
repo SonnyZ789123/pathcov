@@ -1,4 +1,4 @@
-package com.kuleuven.coverage.graph;
+package com.kuleuven.cfg.coverage.graph;
 
 /*
 Logic referenced of CfgCreator of SootUp 2.0.

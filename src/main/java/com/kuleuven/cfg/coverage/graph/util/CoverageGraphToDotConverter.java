@@ -1,8 +1,8 @@
-package com.kuleuven.coverage.graph.util;
+package com.kuleuven.cfg.coverage.graph.util;
 
-import com.kuleuven.coverage.graph.CFGCoverageGraph;
-import com.kuleuven.coverage.graph.CoverageEdge;
-import com.kuleuven.coverage.graph.CoverageNode;
+import com.kuleuven.cfg.coverage.graph.CFGCoverageGraph;
+import com.kuleuven.cfg.coverage.graph.CoverageEdge;
+import com.kuleuven.cfg.coverage.graph.CoverageNode;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import sootup.codepropertygraph.propertygraph.edges.PropertyGraphEdge;
 

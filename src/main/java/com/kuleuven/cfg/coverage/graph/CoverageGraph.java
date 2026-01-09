@@ -1,8 +1,8 @@
-package com.kuleuven.coverage.graph;
+package com.kuleuven.cfg.coverage.graph;
 
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.shared.StmtId;
-import com.kuleuven.coverage.graph.util.CoverageGraphToJsonConverter;
+import com.kuleuven.cfg.coverage.graph.util.CoverageGraphToJsonConverter;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;

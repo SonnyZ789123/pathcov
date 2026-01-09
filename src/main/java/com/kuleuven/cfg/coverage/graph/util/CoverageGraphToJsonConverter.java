@@ -1,10 +1,10 @@
-package com.kuleuven.coverage.graph.util;
+package com.kuleuven.cfg.coverage.graph.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kuleuven.coverage.graph.CoverageEdge;
-import com.kuleuven.coverage.graph.CoverageGraph;
-import com.kuleuven.coverage.graph.CoverageNode;
+import com.kuleuven.cfg.coverage.graph.CoverageEdge;
+import com.kuleuven.cfg.coverage.graph.CoverageGraph;
+import com.kuleuven.cfg.coverage.graph.CoverageNode;
 
 import java.util.HashSet;
 import java.util.Set;

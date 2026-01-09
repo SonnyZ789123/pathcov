@@ -1,4 +1,4 @@
-package com.kuleuven.coverage.graph;
+package com.kuleuven.cfg.coverage.graph;
 
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import org.checkerframework.checker.nullness.qual.NonNull;
