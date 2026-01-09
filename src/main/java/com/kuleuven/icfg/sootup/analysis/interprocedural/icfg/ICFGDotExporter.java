@@ -25,7 +25,9 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.kuleuven.icfg.coverage.CoverageBlockInfo;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
+import org.jspecify.annotations.Nullable;
 import sootup.callgraph.CallGraph;
 import sootup.core.graph.BasicBlock;
 import sootup.core.graph.ControlFlowGraph;
@@ -49,14 +51,15 @@ public class ICFGDotExporter {
     public static String buildICFGGraph(
             Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph,
             View view,
-            CallGraph callGraph) {
+            CallGraph callGraph,
+            @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
         final StringBuilder sb = new StringBuilder();
         DotExporter.buildDiGraphObject(sb);
         Map<Integer, MethodSignature> calls;
         calls = computeCalls(signatureToControlFlowGraph, view, callGraph);
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry :
                 signatureToControlFlowGraph.entrySet()) {
-            String graph = DotExporter.buildGraph(entry.getValue(), true, calls, entry.getKey());
+            String graph = DotExporter.buildGraph(entry.getValue(), true, calls, entry.getKey(), coverageBlockMap);
             sb.append(graph).append("\n");
         }
         sb.append("}");

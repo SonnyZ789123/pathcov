@@ -3,7 +3,7 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.icfg.GenerateICFG" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.nested.Test: int foo(int)>\""
+mvn exec:java -Dexec.mainClass="com.kuleuven.icfg.GenerateICFG" -Dexec.args="$HOME/dev/jdart-examples/out/production/jdart-examples \"<test.nested.Test: int bar(int)>\""
 
 echo "✅ Done!"
 
