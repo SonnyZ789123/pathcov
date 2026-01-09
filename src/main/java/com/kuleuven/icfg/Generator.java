@@ -1,5 +1,6 @@
 package com.kuleuven.icfg;
 
+import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
@@ -52,6 +53,7 @@ public class Generator {
     }
 
     public String dotExport() {
-        return getICfg().buildICFGGraph(icfg.getCg());
+        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg());
+        return builder.buildICFGGraph();
     }
 }
