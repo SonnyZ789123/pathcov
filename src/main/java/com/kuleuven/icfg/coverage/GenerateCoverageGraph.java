@@ -1,4 +1,4 @@
-package com.kuleuven.coverage;
+package com.kuleuven.icfg.coverage;
 
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
@@ -6,7 +6,6 @@ import com.kuleuven.coverage.CoverageAgent.shared.Out;
 import com.kuleuven.coverage.CoverageAgent.util.CoverageCount;
 import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.icfg.Generator;
-import com.kuleuven.icfg.coverage.CoverageBlockInfo;
 import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 
@@ -15,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class GenerateICFGCoverageGraph {
+public class GenerateCoverageGraph {
     public static void main(String[] args) {
         /*
          * Expected arguments:
