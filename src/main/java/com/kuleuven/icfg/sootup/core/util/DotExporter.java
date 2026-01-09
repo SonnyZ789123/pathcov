@@ -23,11 +23,14 @@ package com.kuleuven.icfg.sootup.core.util;
  */
 
 import com.google.common.collect.Sets;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+
 import java.util.*;
+
+import com.kuleuven.coverage.CoverageAgent.shared.StmtId;
+import com.kuleuven.icfg.coverage.CoverageBlockInfo;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import sootup.core.graph.BasicBlock;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.jimple.common.stmt.*;
@@ -44,12 +47,12 @@ import sootup.core.types.ClassType;
  * @author Markus Schmidt, Yoran Mertens
  */
 public class DotExporter {
-
     public static String buildGraph(
             @NonNull ControlFlowGraph<?> graph,
             boolean isICFG,
             Map<Integer, MethodSignature> calls,
-            MethodSignature methodSignature) {
+            MethodSignature methodSignature,
+            @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
         // starting stmt at the top;
@@ -80,6 +83,26 @@ public class DotExporter {
         Set<BasicBlock<?>> drawnBlocks = Sets.newHashSetWithExpectedSize(blocks.size());
 
         for (BasicBlock<?> block : blocks) {
+            StringBuilder coverageLabelSb = new StringBuilder();
+            StringBuilder coverageStyleSb = new StringBuilder();
+            if (coverageBlockMap != null) {
+                Stmt entryStmt = block.getHead();
+                CoverageBlockInfo blockInfo = findBlockInfoByStmt(entryStmt, coverageBlockMap);
+
+                if (blockInfo != null) {
+                    int coverageCount = blockInfo.coverageCount();
+                    coverageLabelSb
+                            .append("\t\tlabel = \"Block #")
+                            .append(blockInfo.blockInfo().blockId())
+                            .append("\t|\thits=").append(coverageCount)
+                            .append("\"\n");
+                    String blockColor = getBlockColor(coverageCount);
+                    coverageStyleSb
+                            .append("\t\tstyle = filled\n")
+                            .append("\t\tcolor = ").append(blockColor).append("\n")
+                            .append("\t\tfontsize = 12\n");
+                }
+            }
 
             sb.append("//  lines [")
                     .append(block.getHead().getPositionInfo().getStmtPosition().getFirstLine())
@@ -90,12 +113,8 @@ public class DotExporter {
             sb.append("\tsubgraph cluster_")
                     .append(block.hashCode())
                     .append(" { \n")
-                    .append("\t\tlabel = \"Block #")
-                    .append(++i)
-                    .append("\"\n")
-                    .append("\t\tstyle = filled\n")
-                    .append("\t\tcolor = darkgreen\n")
-                    .append("\t\tfillcolor = palegreen3\n");
+                    .append(coverageLabelSb)
+                    .append(coverageStyleSb);
 
             /* print stmts in a block*/
             List<Stmt> stmts = block.getStmts();
@@ -223,12 +242,23 @@ public class DotExporter {
         return sb;
     }
 
-    public static String createUrlToWebeditor(@NonNull ControlFlowGraph<?> graph) {
-        try {
-            return "http://magjac.com/graphviz-visual-editor/?dot="
-                    + URLEncoder.encode(buildGraph(graph, false, null, null), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+    private static CoverageBlockInfo findBlockInfoByStmt(Stmt stmt, Map<Integer, CoverageBlockInfo> coverageBlockMap) {
+        String stmtId = StmtId.getStmtId(stmt);
+        for (CoverageBlockInfo coverageBlockInfo : coverageBlockMap.values()) {
+            if (coverageBlockInfo.blockInfo().stmtId().equals(stmtId)) {
+                return coverageBlockInfo;
+            }
+        }
+        return null;
+    }
+
+    private static String getBlockColor(int hits) {
+        if (hits == 0) {
+            return "lightcoral";
+        } else if (hits <= 2) {
+            return "khaki1";
+        } else {
+            return "palegreen3";
         }
     }
 }
