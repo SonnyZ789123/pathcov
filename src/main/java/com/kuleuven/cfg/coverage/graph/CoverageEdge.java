@@ -1,4 +1,4 @@
-package com.kuleuven.coverage.graph;
+package com.kuleuven.cfg.coverage.graph;
 
 import sootup.codepropertygraph.propertygraph.edges.*;
 import sootup.codepropertygraph.propertygraph.nodes.ControlFlowGraphNode;

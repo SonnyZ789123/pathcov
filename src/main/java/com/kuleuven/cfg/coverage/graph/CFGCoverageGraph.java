@@ -1,6 +1,6 @@
-package com.kuleuven.coverage.graph;
+package com.kuleuven.cfg.coverage.graph;
 
-import com.kuleuven.coverage.graph.util.CoverageGraphToDotConverter;
+import com.kuleuven.cfg.coverage.graph.util.CoverageGraphToDotConverter;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
 import sootup.codepropertygraph.propertygraph.edges.PropertyGraphEdge;
 import sootup.codepropertygraph.propertygraph.nodes.PropertyGraphNode;
