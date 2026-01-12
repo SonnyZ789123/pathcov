@@ -20,17 +20,21 @@ public class GenerateBlockMap {
          *   0: classPath              (e.g., "./target/classes")
          *   1: entryMethod            (e.g., "<com.kuleuven._examples.Foo: int foo(int)>")
          *   2: outputPath             (e.g., "./output/block_map.json")
+         *   3: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <entryMethod> [outputPath]");
+            System.out.println("Expects args <classPath> <entryMethod> [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String entryFQMethodSignature = args[1];
         String outputPath = args.length >= 3 ? args[2] : null;
+        List<String> projectPrefixes = args.length >= 4
+                ? List.of(args[3].split(","))
+                : List.of();
 
-        BlockInfoByIdMap blockMap = createICfgBlockMap(classPath, entryFQMethodSignature);
+        BlockInfoByIdMap blockMap = createICfgBlockMap(classPath, entryFQMethodSignature, projectPrefixes);
 
         try {
             blockMap.dump(outputPath);
@@ -40,13 +44,13 @@ public class GenerateBlockMap {
         }
     }
 
-    private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature) {
+    private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature, List<String> projectPrefixes) {
         Generator generator = new Generator(classPath, entryFQMethodSignature);
 
         JimpleBasedInterproceduralCFG icfg = generator.getICfg();
         CallGraph callGraph = icfg.getCg();
 
-        SootUpCGWrapper cgWrapper = new SootUpCGWrapper(callGraph);
+        SootUpCGWrapper cgWrapper = new SootUpCGWrapper(callGraph, projectPrefixes);
         Set<MethodSignature> methodSignatures = cgWrapper.getNodes();
 
         List<SootMethod> methods = methodSignatures.stream()

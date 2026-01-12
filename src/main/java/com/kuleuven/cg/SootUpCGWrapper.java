@@ -12,10 +12,8 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     private final Set<MethodSignature> nodes;
     private final Set<SootUpCallWrapper> edges;
 
-    public SootUpCGWrapper(CallGraph callGraph) {
-        String[] projectPrefixes = AppConfig.get("project.prefixes").split(",");
-
-        ProjectMethodFilter filter = new ProjectMethodFilter(List.of(projectPrefixes));
+    public SootUpCGWrapper(CallGraph callGraph, List<String> projectPrefixes) {
+        ProjectMethodFilter filter = new ProjectMethodFilter(projectPrefixes);
         this.callGraph = callGraph;
 
         Set<MethodSignature> methodSignatures = callGraph.getMethodSignatures();
