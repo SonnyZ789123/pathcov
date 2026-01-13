@@ -78,17 +78,5 @@ public class GenerateCoverageGraph {
             writer.write(coverageGraph.getGraph().toDotGraph());
             System.out.println("✅ Coverage graph DOT file written to " + outputPath);
         }
-
-        String rankingOutputPathPrefix = AppConfig.get("coverage.graph.jdart.write.path_prefix");
-        String rankingExt = AppConfig.get("coverage.graph.jdart.write.extension");
-        String rankingOutputPathString = String.format("%s%s%s", rankingOutputPathPrefix, i, rankingExt);
-
-        Path rankingOutputPath = Path.of(rankingOutputPathString);
-        Files.createDirectories(rankingOutputPath.getParent());
-
-        try (FileWriter writer = new FileWriter(rankingOutputPath.toFile())) {
-            writer.write(coverageGraph.toJson());
-            System.out.println("✅ Coverage graph JSON file written to " + rankingOutputPath);
-        }
     }
 }
