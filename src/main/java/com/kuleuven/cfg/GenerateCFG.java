@@ -1,5 +1,6 @@
 package com.kuleuven.cfg;
 
+import com.github.javaparser.quality.Nullable;
 import com.kuleuven.config.AppConfig;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.util.DotExporter;
@@ -15,20 +16,22 @@ public class GenerateCFG {
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
          *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
+         *   2: outputPath             (e.g., "./out/visualization/cfg/cfg.dot")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature>");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> [outputPath]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
+        String outputPath = args.length >= 3 ? args[2] : null;
 
         try {
             Generator generator = new Generator(classPath, fullyQualifiedMethodSignature);
             ControlFlowGraph<?> cfg = generator.getCfg();
 
-            writeOutputs(cfg);
+            writeOutputs(cfg, outputPath);
         } catch (IOException e) {
             System.err.println("❌ Control flow graph generation failed: " + e.getMessage());
             System.exit(1);
@@ -39,11 +42,11 @@ public class GenerateCFG {
      * Writes the control flow graph's DOT representation.
      *
      * @param cfg The control flow graph to write
+     * @param outputPath The optional output path
      * @throws IOException If writing fails
      */
-    private static void writeOutputs(ControlFlowGraph<?> cfg) throws IOException {
-
-        String cfgPath = AppConfig.get("cfg.write.path");
+    private static void writeOutputs(ControlFlowGraph<?> cfg,  @Nullable String outputPath) throws IOException {
+        String cfgPath = outputPath != null ? outputPath : AppConfig.get("cfg.write.path");
 
         Path output = Path.of(cfgPath);
         Files.createDirectories(output.getParent());

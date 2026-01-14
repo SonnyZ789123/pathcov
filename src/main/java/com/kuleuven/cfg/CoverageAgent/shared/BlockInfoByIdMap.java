@@ -26,6 +26,7 @@ import java.util.Map;
  * BlockInfo to ID mapping for a single CFG.
  * @deprecated Conversion to interprocedural CFGs.
  */
+@Deprecated
 public final class BlockInfoByIdMap {
     private final SootMethod method;
     private final ControlFlowGraph<?> cfg;
