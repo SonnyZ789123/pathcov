@@ -9,6 +9,7 @@ import java.util.List;
  * Generate the block map for a single CFG.
  * @deprecated Not maintained anymore. Use the ICFG module instead.
  */
+@Deprecated
 public class GenerateBlockMap {
     public static void main(String[] args) {
         /*
