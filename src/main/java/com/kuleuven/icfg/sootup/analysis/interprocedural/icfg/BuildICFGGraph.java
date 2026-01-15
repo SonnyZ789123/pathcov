@@ -57,11 +57,11 @@ public class BuildICFGGraph {
         this.coverageBlockMap = coverageBlockMap;
     }
 
-    public String buildICFGGraph() {
+    public String buildICFGGraph(boolean compact) {
         CallGraph callGraph = icfg.getCg();
         Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph = new LinkedHashMap<>();
         computeAllCalls(callGraph.getEntryMethods(), signatureToControlFlowGraph, callGraph);
-        return ICFGDotExporter.buildICFGGraph(signatureToControlFlowGraph, view, callGraph, coverageBlockMap);
+        return ICFGDotExporter.buildICFGGraph(signatureToControlFlowGraph, view, callGraph, compact, coverageBlockMap);
     }
 
     public void computeAllCalls(

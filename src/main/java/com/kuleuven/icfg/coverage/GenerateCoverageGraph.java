@@ -61,7 +61,7 @@ public class GenerateCoverageGraph {
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
             BuildICFGGraph builder = new BuildICFGGraph(generator.view, icfg, coverageBlockMap);
-            String icfgAsDot = builder.buildICFGGraph();
+            String icfgAsDot = builder.buildICFGGraph(true);
 
             writeOutputs(icfgAsDot, outputpath);
         } catch (IOException e) {

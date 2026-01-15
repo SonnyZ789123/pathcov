@@ -52,6 +52,7 @@ public class ICFGDotExporter {
             Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph,
             View view,
             CallGraph callGraph,
+            boolean compact,
             @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
         final StringBuilder sb = new StringBuilder();
         DotExporter.buildDiGraphObject(sb);
@@ -65,6 +66,7 @@ public class ICFGDotExporter {
                     calls,
                     entry.getKey(),
                     methodSignatures,
+                    compact,
                     coverageBlockMap);
             sb.append(graph).append("\n");
         }
