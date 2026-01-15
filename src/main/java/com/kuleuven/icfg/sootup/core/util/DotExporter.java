@@ -51,6 +51,7 @@ public class DotExporter {
             @NonNull ControlFlowGraph<?> graph,
             Map<Integer, MethodSignature> calls,
             MethodSignature methodSignature,
+            Set<MethodSignature> methodSignatures,
             @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
@@ -113,24 +114,32 @@ public class DotExporter {
 
             /* print stmts in a block*/
             drawnBlocks.add(block);
-            List<Stmt> stmts = block.getStmts();
 
+            List<Stmt> stmts = block.getStmts();
+            List<Stmt> shownStmts = new ArrayList<>();
             for (Stmt stmt : stmts) {
-                sb.append(createIternalBlockStmt(stmt, stmt.equals(startingStmt)));
+                boolean invokesOtherMethod = calls.entrySet().stream()
+                        .filter(stmtToMethodSignature ->
+                                methodSignatures.contains(stmtToMethodSignature.getValue()))
+                        .anyMatch(stmtToMethodSignature ->
+                                stmtToMethodSignature.getKey().equals(stmt.hashCode()));
+
+                if (block.getHead().equals(stmt) || block.getTail().equals(stmt) || invokesOtherMethod) {
+                    sb.append(createIternalBlockStmt(stmt, stmt.equals(startingStmt)));
+                    shownStmts.add(stmt);
+                }
             }
 
             // add blocks internal connection
             if (stmts.size() > 1) {
                 sb.append("\n\t\t");
-                for (Stmt stmt : stmts) {
-                    if (methodSignature != null && calls != null) {
-                        for (Map.Entry<Integer, MethodSignature> entry : calls.entrySet()) {
-                            int stmtHashCode = entry.getKey();
-                            MethodSignature targetMethodSignature = entry.getValue();
-                            if (methodSignature.equals(targetMethodSignature) && !isAdded) {
-                                sb.append(stmtHashCode).append(" -> ");
-                                isAdded = true;
-                            }
+                for (Stmt stmt : shownStmts) {
+                    for (Map.Entry<Integer, MethodSignature> entry : calls.entrySet()) {
+                        int stmtHashCode = entry.getKey();
+                        MethodSignature targetMethodSignature = entry.getValue();
+                        if (methodSignature.equals(targetMethodSignature) && !isAdded) {
+                            sb.append(stmtHashCode).append(" -> ");
+                            isAdded = true;
                         }
                     }
                     sb.append(stmt.hashCode()).append(" -> ");
