@@ -59,7 +59,7 @@ public class ICFGDotExporter {
         calls = computeCalls(signatureToControlFlowGraph, view, callGraph);
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry :
                 signatureToControlFlowGraph.entrySet()) {
-            String graph = DotExporter.buildGraph(entry.getValue(), true, calls, entry.getKey(), coverageBlockMap);
+            String graph = DotExporter.buildGraph(entry.getValue(), calls, entry.getKey(), coverageBlockMap);
             sb.append(graph).append("\n");
         }
         sb.append("}");
