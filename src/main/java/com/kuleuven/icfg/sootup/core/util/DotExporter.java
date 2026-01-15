@@ -40,8 +40,8 @@ import sootup.core.types.ClassType;
 
 /**
  * Exports a ControlFlowGraph into a Dot representation (see https://graphviz.org) to visualize the
- * Graph
- *
+ * Graph.
+ * <p>
  * Slightly modified version of SootUp's v2.0.1 DotExporter to support weighted nodes in ICFGs
  *
  * @author Markus Schmidt, Yoran Mertens
@@ -117,19 +117,11 @@ public class DotExporter {
                     .append(coverageStyleSb);
 
             /* print stmts in a block*/
-            List<Stmt> stmts = block.getStmts();
             drawnBlocks.add(block);
+            List<Stmt> stmts = block.getStmts();
+
             for (Stmt stmt : stmts) {
-                sb.append("\t\t")
-                        .append(stmt.hashCode())
-                        .append("[label=\"")
-                        .append(escape(stmt.toString()))
-                        .append("\"");
-                // mark startingstmt itself
-                if (startingStmt == stmt || stmt.getExpectedSuccessorCount() == 0) {
-                    sb.append(",shape=Mdiamond,color=grey50,fillcolor=white");
-                }
-                sb.append("]\n");
+                sb.append(createIternalBlockStmt(stmt, stmt.equals(startingStmt)));
             }
 
             // add blocks internal connection
@@ -138,10 +130,10 @@ public class DotExporter {
                 for (Stmt stmt : stmts) {
                     if (methodSignature != null && calls != null) {
                         for (Map.Entry<Integer, MethodSignature> entry : calls.entrySet()) {
-                            int key = entry.getKey();
-                            MethodSignature value = entry.getValue();
-                            if (methodSignature.equals(value) && !isAdded) {
-                                sb.append(key).append(" -> ");
+                            int stmtHashCode = entry.getKey();
+                            MethodSignature targetMethodSignature = entry.getValue();
+                            if (methodSignature.equals(targetMethodSignature) && !isAdded) {
+                                sb.append(stmtHashCode).append(" -> ");
                                 isAdded = true;
                             }
                         }
@@ -223,6 +215,21 @@ public class DotExporter {
         } else {
             return sb.toString();
         }
+    }
+
+    private static String createIternalBlockStmt(Stmt stmt, boolean isStartingStmt) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t\t")
+                .append(stmt.hashCode())
+                .append("[label=\"")
+                .append(escape(stmt.toString()))
+                .append("\"");
+        // mark startingstmt itself
+        if (isStartingStmt || stmt.getExpectedSuccessorCount() == 0) {
+            sb.append(",shape=Mdiamond,color=grey50,fillcolor=white");
+        }
+        sb.append("]\n");
+        return sb.toString();
     }
 
     private static String escape(String str) {
