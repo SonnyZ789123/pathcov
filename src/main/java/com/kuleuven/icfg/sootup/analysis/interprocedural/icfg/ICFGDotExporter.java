@@ -56,10 +56,16 @@ public class ICFGDotExporter {
         final StringBuilder sb = new StringBuilder();
         DotExporter.buildDiGraphObject(sb);
         Map<Integer, MethodSignature> calls;
+        Set<MethodSignature> methodSignatures = signatureToControlFlowGraph.keySet();
         calls = computeCalls(signatureToControlFlowGraph, view, callGraph);
-        for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry :
-                signatureToControlFlowGraph.entrySet()) {
-            String graph = DotExporter.buildGraph(entry.getValue(), calls, entry.getKey(), coverageBlockMap);
+
+        for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry : signatureToControlFlowGraph.entrySet()) {
+            String graph = DotExporter.buildGraph(
+                    entry.getValue(),
+                    calls,
+                    entry.getKey(),
+                    methodSignatures,
+                    coverageBlockMap);
             sb.append(graph).append("\n");
         }
         sb.append("}");
