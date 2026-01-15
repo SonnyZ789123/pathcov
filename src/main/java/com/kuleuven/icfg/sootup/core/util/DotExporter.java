@@ -49,7 +49,6 @@ import sootup.core.types.ClassType;
 public class DotExporter {
     public static String buildGraph(
             @NonNull ControlFlowGraph<?> graph,
-            boolean isICFG,
             Map<Integer, MethodSignature> calls,
             MethodSignature methodSignature,
             @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
@@ -62,10 +61,6 @@ public class DotExporter {
         StringBuilder sb = new StringBuilder();
 
         boolean isAdded = false;
-
-        if (!isICFG) {
-            buildDiGraphObject(sb);
-        }
 
         /* entrypoint */
         Stmt startingStmt = graph.getStartingStmt();
@@ -210,11 +205,7 @@ public class DotExporter {
             sb.append("\n");
         }
 
-        if (!isICFG) {
-            return sb.append("}").toString();
-        } else {
-            return sb.toString();
-        }
+        return sb.toString();
     }
 
     private static String createIternalBlockStmt(Stmt stmt, boolean isStartingStmt) {
