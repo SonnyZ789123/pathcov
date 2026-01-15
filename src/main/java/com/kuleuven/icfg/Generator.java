@@ -54,6 +54,6 @@ public class Generator {
 
     public String dotExport() {
         BuildICFGGraph builder = new BuildICFGGraph(view, getICfg());
-        return builder.buildICFGGraph();
+        return builder.buildICFGGraph(false);
     }
 }

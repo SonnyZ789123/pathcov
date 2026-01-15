@@ -52,6 +52,7 @@ public class DotExporter {
             Map<Integer, MethodSignature> calls,
             MethodSignature methodSignature,
             Set<MethodSignature> methodSignatures,
+            boolean compact,
             @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
@@ -117,16 +118,23 @@ public class DotExporter {
 
             List<Stmt> stmts = block.getStmts();
             List<Stmt> shownStmts = new ArrayList<>();
-            for (Stmt stmt : stmts) {
-                boolean invokesOtherMethod = calls.entrySet().stream()
-                        .filter(stmtToMethodSignature ->
-                                methodSignatures.contains(stmtToMethodSignature.getValue()))
-                        .anyMatch(stmtToMethodSignature ->
-                                stmtToMethodSignature.getKey().equals(stmt.hashCode()));
-
-                if (block.getHead().equals(stmt) || block.getTail().equals(stmt) || invokesOtherMethod) {
+            if (!compact) { // show all stmts
+                stmts.forEach(stmt -> {
                     sb.append(createIternalBlockStmt(stmt, stmt.equals(startingStmt)));
                     shownStmts.add(stmt);
+                });
+            } else { // show only head, tail and calls to other methods
+                for (Stmt stmt : stmts) {
+                    boolean invokesOtherMethod = calls.entrySet().stream()
+                            .filter(stmtToMethodSignature ->
+                                    methodSignatures.contains(stmtToMethodSignature.getValue()))
+                            .anyMatch(stmtToMethodSignature ->
+                                    stmtToMethodSignature.getKey().equals(stmt.hashCode()));
+
+                    if (block.getHead().equals(stmt) || block.getTail().equals(stmt) || invokesOtherMethod) {
+                        sb.append(createIternalBlockStmt(stmt, stmt.equals(startingStmt)));
+                        shownStmts.add(stmt);
+                    }
                 }
             }
 
