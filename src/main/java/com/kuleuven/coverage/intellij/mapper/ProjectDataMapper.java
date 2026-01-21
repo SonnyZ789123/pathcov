@@ -7,10 +7,59 @@ import com.intellij.rt.coverage.data.instructions.LineInstructions;
 import com.intellij.rt.coverage.data.instructions.SwitchInstructions;
 import com.intellij.rt.coverage.util.ArrayUtil;
 import com.kuleuven.coverage.intellij.model.*;
+import com.kuleuven.coverage.intellij.model.coverage.*;
+import com.kuleuven.coverage.intellij.model.coverage.LineCoverage;
 
 import java.util.List;
+import java.util.Map;
 
 public final class ProjectDataMapper {
+
+    public static CoverageReportJson mapSimple(ProjectData projectData) {
+        CoverageReportJson report = new CoverageReportJson();
+
+        for (ClassData classData : projectData.getClassesCollection()) {
+            LineData[] lines = (LineData[]) classData.getLines();
+            if (lines == null) continue;
+
+            Map<String, List<LineData>> linesPerMethod =
+                    classData.mapLinesToMethods();
+
+            ClassCoverage cls = new ClassCoverage();
+            cls.name = classData.getName();
+
+            for (Map.Entry<String, List<LineData>> entry : linesPerMethod.entrySet()) {
+                String methodSignature = entry.getKey();
+                List<LineData> methodLines = entry.getValue();
+
+                MethodCoverage method = new MethodCoverage();
+                method.methodSignature = methodSignature;
+
+                for (LineData line : methodLines) {
+                    if (line == null) continue;
+
+                    LineCoverage lc = new LineCoverage();
+                    lc.lineNumber = line.getLineNumber();
+                    lc.hits = line.getHits();
+
+                    method.lines.add(lc);
+                }
+
+                // Only add method if it has lines
+                if (!method.lines.isEmpty()) {
+                    cls.methods.add(method);
+                }
+            }
+
+            // Only add class if it has methods
+            if (!cls.methods.isEmpty()) {
+                report.classes.add(cls);
+            }
+        }
+
+        return report;
+    }
+
 
     public static CoverageReportDTO map(ProjectData projectData) {
         CoverageReportDTO report = new CoverageReportDTO();

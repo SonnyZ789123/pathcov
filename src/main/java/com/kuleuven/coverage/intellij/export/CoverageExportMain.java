@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.kuleuven.coverage.intellij.loader.IntelliJCoverageLoader;
 import com.kuleuven.coverage.intellij.mapper.ProjectDataMapper;
-import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
+import com.kuleuven.coverage.intellij.model.coverage.CoverageReportJson;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -25,7 +25,7 @@ public final class CoverageExportMain {
         // Load coverage and build DTO model
         ProjectData projectData = IntelliJCoverageLoader.loadFromConfig(configPath);
 
-        CoverageReportDTO report = ProjectDataMapper.map(projectData);
+        CoverageReportJson report = ProjectDataMapper.mapSimple(projectData);
 
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
