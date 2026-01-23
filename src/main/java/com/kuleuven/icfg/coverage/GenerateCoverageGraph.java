@@ -33,7 +33,7 @@ public class GenerateCoverageGraph {
         String fullyQualifiedMethodSignature = args[1];
         String coverageDataPath = args[2];
         String blockMapPath = args.length >= 4 ? args[3] : null;
-        String outputpath = args.length >= 5 ? args[4] : null;
+        String outputPath = args.length >= 5 ? args[4] : null;
 
         Map<Integer, BlockInfo> blockMap = null;
         try {
@@ -51,7 +51,7 @@ public class GenerateCoverageGraph {
             BuildICFGGraph builder = new BuildICFGGraph(generator.view, icfg, reader.getCoverageReport());
             String icfgAsDot = builder.buildICFGGraph(true);
 
-            writeOutputs(icfgAsDot, outputpath);
+            writeOutputs(icfgAsDot, outputPath);
         } catch (IOException e) {
             System.err.println("❌ Failed to read block coverage map from path " + coverageDataPath);
             System.exit(1);
