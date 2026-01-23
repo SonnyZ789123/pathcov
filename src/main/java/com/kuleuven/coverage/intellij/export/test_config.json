@@ -1,0 +1,13 @@
+{
+  "reportPath": "/Users/yoran/dev/master-thesis/coverage-guided-concolic-pipeline/development/data/intellij-coverage/intellij-coverage-report.ic",
+  "outputRoots": [
+    "/Users/yoran/dev/jdart-examples/out/production/jdart-examples"
+  ],
+  "sourceRoots": [
+    "/Users/yoran/dev/jdart-examples/src/examples"
+  ],
+  "includeClasses": [
+    "test.blockmap.Test"
+  ],
+  "outputJson": "/Users/yoran/dev/master-thesis/pathcov/out/line_coverage_export.json"
+}
