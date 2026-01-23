@@ -1,8 +1,8 @@
 package com.kuleuven.coverage;
 
-import com.kuleuven.coverage.intellij.model.ClassDTO;
-import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
-import com.kuleuven.coverage.intellij.model.MethodDTO;
+import com.kuleuven.coverage.model.ClassDTO;
+import com.kuleuven.coverage.model.CoverageReportDTO;
+import com.kuleuven.coverage.model.MethodDTO;
 
 public class CoverageReport {
     private final CoverageReportDTO coverageReport;

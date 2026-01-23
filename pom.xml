@@ -85,6 +85,11 @@
             <artifactId>intellij-coverage-reporter</artifactId>
             <version>1.0.771</version>
         </dependency>
+        <dependency>
+            <groupId>com.kuleuven</groupId>
+            <artifactId>intellij-coverage-model</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
 </project>

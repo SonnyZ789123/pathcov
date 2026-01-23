@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.intellij.rt.coverage.data.ProjectData;
 import com.kuleuven.coverage.intellij.loader.IntelliJCoverageLoader;
 import com.kuleuven.coverage.intellij.mapper.ProjectDataMapper;
-import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
+import com.kuleuven.coverage.model.CoverageReportDTO;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
