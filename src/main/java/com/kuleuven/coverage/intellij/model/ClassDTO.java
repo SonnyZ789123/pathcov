@@ -5,6 +5,6 @@ import java.util.List;
 
 public class ClassDTO {
     public String name;
-    public List<LineDTO> lines = new ArrayList<>();
+    public List<MethodDTO> methods = new ArrayList<>();
 }
 

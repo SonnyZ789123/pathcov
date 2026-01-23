@@ -1,28 +1,26 @@
 package com.kuleuven.coverage;
 
-import com.kuleuven.coverage.intellij.model.coverage.ClassCoverage;
-import com.kuleuven.coverage.intellij.model.coverage.CoverageReportJson;
-import com.kuleuven.coverage.intellij.model.coverage.MethodCoverage;
+import com.kuleuven.coverage.intellij.model.ClassDTO;
+import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
+import com.kuleuven.coverage.intellij.model.MethodDTO;
 
 public class CoverageReport {
-    private final CoverageReportJson coverageReport;
+    private final CoverageReportDTO coverageReport;
 
-    public CoverageReport(CoverageReportJson coverageReport) {
+    public CoverageReport(CoverageReportDTO coverageReport) {
         this.coverageReport = coverageReport;
     }
 
-    public CoverageReportJson getCoverageReport() {
+    public CoverageReportDTO getCoverageReport() {
         return coverageReport;
     }
 
-    public MethodCoverage getForMethodFullName(String methodFullName) {
-        for (ClassCoverage classCoverage : coverageReport.classes) {
+    public MethodDTO getForMethodFullName(String methodFullName) {
+        for (ClassDTO classCoverage : coverageReport.classes) {
             String jvmClassName = classCoverage.name.replace('.', '/');
 
-            for (MethodCoverage methodCoverage : classCoverage.methods) {
+            for (MethodDTO methodCoverage : classCoverage.methods) {
                 String otherMethodFullName = jvmClassName + "." + methodCoverage.methodSignature;
-
-                System.out.println(methodFullName + " -> " + otherMethodFullName);
 
                 if (otherMethodFullName.equals(methodFullName)) {
                     return methodCoverage;

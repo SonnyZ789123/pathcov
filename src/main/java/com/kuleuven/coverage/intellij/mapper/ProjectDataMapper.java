@@ -68,6 +68,8 @@ public final class ProjectDataMapper {
             LineData[] lines = (LineData[]) classData.getLines();
             if (lines == null) continue;
 
+            Map<String, List<LineData>> linesPerMethod = classData.mapLinesToMethods();
+
             ClassDTO cls = new ClassDTO();
             cls.name = classData.getName();
 
@@ -76,83 +78,94 @@ public final class ProjectDataMapper {
             LineInstructions[] lineInstrs =
                     ci == null ? null : ci.getlines();
 
-            for (LineData line : lines) {
-                if (line == null) continue;
+            for (Map.Entry<String, List<LineData>> entry : linesPerMethod.entrySet()) {
+                String methodSignature = entry.getKey();
+                List<LineData> methodLines = entry.getValue();
+                if (methodLines.isEmpty()) continue;
 
-                LineDTO l = new LineDTO();
-                l.line = line.getLineNumber();
-                l.hits = line.getHits();
+                MethodDTO method = new MethodDTO();
+                method.methodSignature = methodSignature;
 
-                // Branch summary
-                BranchData bd = line.getBranchData();
-                l.branches = new BranchSummaryDTO();
-                l.branches.total = bd == null ? 0 : bd.getTotalBranches();
-                l.branches.covered = bd == null ? 0 : bd.getCoveredBranches();
+                for (LineData line : methodLines) {
+                    if (line == null) continue;
 
-                if (lineInstrs != null) {
-                    LineInstructions li = ArrayUtil.safeLoad(lineInstrs, l.line);
-                    if (li != null) {
+                    LineDTO l = new LineDTO();
+                    l.line = line.getLineNumber();
+                    l.hits = line.getHits();
 
-                        // Instruction summary
-                        BranchData id = li.getInstructionsData(line);
-                        l.instructions = new InstructionSummaryDTO();
-                        l.instructions.straight = li.getInstructions();
-                        l.instructions.total = id.getTotalBranches();
-                        l.instructions.covered = id.getCoveredBranches();
+                    // Branch summary
+                    BranchData bd = line.getBranchData();
+                    l.branches = new BranchSummaryDTO();
+                    l.branches.total = bd == null ? 0 : bd.getTotalBranches();
+                    l.branches.covered = bd == null ? 0 : bd.getCoveredBranches();
 
-                        // Jumps
-                        JumpData[] jumps = line.getJumps();
-                        List<JumpInstructions> jis = li.getJumps();
-                        if (jumps != null && jis != null) {
-                            for (int i = 0; i < Math.min(jumps.length, jis.size()); i++) {
-                                JumpDTO j = new JumpDTO();
-                                j.index = i;
+                    if (lineInstrs != null) {
+                        LineInstructions li = ArrayUtil.safeLoad(lineInstrs, l.line);
+                        if (li != null) {
 
-                                JumpData jd = jumps[i];
-                                JumpInstructions ji = jis.get(i);
+                            // Instruction summary
+                            BranchData id = li.getInstructionsData(line);
+                            l.instructions = new InstructionSummaryDTO();
+                            l.instructions.straight = li.getInstructions();
+                            l.instructions.total = id.getTotalBranches();
+                            l.instructions.covered = id.getCoveredBranches();
 
-                                j.trueBranch = new OutcomeDTO();
-                                j.trueBranch.instr = ji.getInstructions(true);
-                                j.trueBranch.hits = jd.getTrueHits();
+                            // Jumps
+                            JumpData[] jumps = line.getJumps();
+                            List<JumpInstructions> jis = li.getJumps();
+                            if (jumps != null && jis != null) {
+                                for (int i = 0; i < Math.min(jumps.length, jis.size()); i++) {
+                                    JumpDTO j = new JumpDTO();
+                                    j.index = i;
 
-                                j.falseBranch = new OutcomeDTO();
-                                j.falseBranch.instr = ji.getInstructions(false);
-                                j.falseBranch.hits = jd.getFalseHits();
+                                    JumpData jd = jumps[i];
+                                    JumpInstructions ji = jis.get(i);
 
-                                l.jumps.add(j);
-                            }
-                        }
+                                    j.trueBranch = new OutcomeDTO();
+                                    j.trueBranch.instr = ji.getInstructions(true);
+                                    j.trueBranch.hits = jd.getTrueHits();
 
-                        // Switches
-                        SwitchData[] sds = line.getSwitches();
-                        List<SwitchInstructions> sis = li.getSwitches();
-                        if (sds != null && sis != null) {
-                            for (int i = 0; i < Math.min(sds.length, sis.size()); i++) {
-                                SwitchDTO s = new SwitchDTO();
-                                s.index = i;
+                                    j.falseBranch = new OutcomeDTO();
+                                    j.falseBranch.instr = ji.getInstructions(false);
+                                    j.falseBranch.hits = jd.getFalseHits();
 
-                                SwitchData sd = sds[i];
-                                SwitchInstructions si = sis.get(i);
-
-                                s.defaultBranch = new OutcomeDTO();
-                                s.defaultBranch.instr = si.getInstructions(-1);
-                                s.defaultBranch.hits = sd.getDefaultHits();
-
-                                for (int k = 0; k < sd.getKeys().length; k++) {
-                                    CaseDTO c = new CaseDTO();
-                                    c.key = sd.getKeys()[k];
-                                    c.instr = si.getInstructions(k);
-                                    c.hits = sd.getHits()[k];
-                                    s.cases.add(c);
+                                    l.jumps.add(j);
                                 }
+                            }
 
-                                l.switches.add(s);
+                            // Switches
+                            SwitchData[] sds = line.getSwitches();
+                            List<SwitchInstructions> sis = li.getSwitches();
+                            if (sds != null && sis != null) {
+                                for (int i = 0; i < Math.min(sds.length, sis.size()); i++) {
+                                    SwitchDTO s = new SwitchDTO();
+                                    s.index = i;
+
+                                    SwitchData sd = sds[i];
+                                    SwitchInstructions si = sis.get(i);
+
+                                    s.defaultBranch = new OutcomeDTO();
+                                    s.defaultBranch.instr = si.getInstructions(-1);
+                                    s.defaultBranch.hits = sd.getDefaultHits();
+
+                                    for (int k = 0; k < sd.getKeys().length; k++) {
+                                        CaseDTO c = new CaseDTO();
+                                        c.key = sd.getKeys()[k];
+                                        c.instr = si.getInstructions(k);
+                                        c.hits = sd.getHits()[k];
+                                        s.cases.add(c);
+                                    }
+
+                                    l.switches.add(s);
+                                }
                             }
                         }
                     }
+
+                    method.lines.add(l);
                 }
 
-                cls.lines.add(l);
+                cls.methods.add(method);
             }
 
             report.classes.add(cls);

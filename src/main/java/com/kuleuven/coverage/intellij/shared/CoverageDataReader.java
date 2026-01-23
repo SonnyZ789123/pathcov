@@ -2,7 +2,7 @@ package com.kuleuven.coverage.intellij.shared;
 
 import com.google.gson.Gson;
 import com.kuleuven.coverage.CoverageReport;
-import com.kuleuven.coverage.intellij.model.coverage.CoverageReportJson;
+import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -16,7 +16,7 @@ public class CoverageDataReader {
         Gson gson = new Gson();
 
         try (Reader r = Files.newBufferedReader(Path.of(outputPath))) {
-            CoverageReportJson coverageReportDTO = gson.fromJson(r, CoverageReportJson.class);
+            CoverageReportDTO coverageReportDTO = gson.fromJson(r, CoverageReportDTO.class);
             this.coverageReport = new CoverageReport(coverageReportDTO);
         }
     }
