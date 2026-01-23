@@ -25,8 +25,11 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kuleuven.icfg.coverage.CoverageBlockInfo;
+import com.kuleuven.coverage.CoverageReport;
+import com.kuleuven.coverage.intellij.model.coverage.LineCoverage;
+import com.kuleuven.coverage.intellij.model.coverage.MethodCoverage;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
+import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
 import sootup.callgraph.CallGraph;
 import sootup.core.graph.BasicBlock;
@@ -53,7 +56,7 @@ public class ICFGDotExporter {
             View view,
             CallGraph callGraph,
             boolean compact,
-            @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
+            @Nullable CoverageReport coverageReport) {
         final StringBuilder sb = new StringBuilder();
         DotExporter.buildDiGraphObject(sb);
         Map<Integer, MethodSignature> calls;
@@ -61,13 +64,21 @@ public class ICFGDotExporter {
         calls = computeCalls(signatureToControlFlowGraph, view, callGraph);
 
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry : signatureToControlFlowGraph.entrySet()) {
+            String jvmFullName = SootMethodEncoder.toJvmMethodFullName(entry.getKey().toString());
+
+            List<LineCoverage> methodLineCoverage = null;
+            if (coverageReport != null) {
+                MethodCoverage methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
+                methodLineCoverage = methodCoverage != null ? methodCoverage.lines : Collections.emptyList();
+            }
+
             String graph = DotExporter.buildGraph(
                     entry.getValue(),
                     calls,
                     entry.getKey(),
                     methodSignatures,
                     compact,
-                    coverageBlockMap);
+                    methodLineCoverage);
             sb.append(graph).append("\n");
         }
         sb.append("}");
