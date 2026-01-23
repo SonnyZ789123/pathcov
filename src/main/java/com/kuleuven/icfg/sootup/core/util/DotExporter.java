@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 import java.util.*;
 
-import com.kuleuven.coverage.intellij.model.coverage.LineCoverage;
+import com.kuleuven.coverage.intellij.model.LineDTO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -52,7 +52,7 @@ public class DotExporter {
             MethodSignature methodSignature,
             Set<MethodSignature> methodSignatures,
             boolean compact,
-            @Nullable List<LineCoverage> methodLineCoverage) {
+            @Nullable List<LineDTO> methodLineCoverage) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
         // starting stmt at the top;
@@ -250,12 +250,12 @@ public class DotExporter {
         return sb;
     }
 
-    private static int getCoverageCount(BasicBlock<?> block, List<LineCoverage> methodLineCoverage) {
+    private static int getCoverageCount(BasicBlock<?> block, List<LineDTO> methodLineCoverage) {
         // TODO: Can we assume that the first line of the first statement represents the block's whole coverage?
         int lineNumber = block.getHead().getPositionInfo().getStmtPosition().getFirstLine();
 
-        for (LineCoverage lineCoverage : methodLineCoverage) {
-            if (lineCoverage.lineNumber == lineNumber) {
+        for (LineDTO lineCoverage : methodLineCoverage) {
+            if (lineCoverage.line == lineNumber) {
                 return lineCoverage.hits;
             }
         }

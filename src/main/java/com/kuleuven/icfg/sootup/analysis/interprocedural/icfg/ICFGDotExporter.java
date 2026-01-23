@@ -26,8 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.kuleuven.coverage.CoverageReport;
-import com.kuleuven.coverage.intellij.model.coverage.LineCoverage;
-import com.kuleuven.coverage.intellij.model.coverage.MethodCoverage;
+import com.kuleuven.coverage.intellij.model.LineDTO;
+import com.kuleuven.coverage.intellij.model.MethodDTO;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
@@ -66,9 +66,9 @@ public class ICFGDotExporter {
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry : signatureToControlFlowGraph.entrySet()) {
             String jvmFullName = SootMethodEncoder.toJvmMethodFullName(entry.getKey().toString());
 
-            List<LineCoverage> methodLineCoverage = null;
+            List<LineDTO> methodLineCoverage = null;
             if (coverageReport != null) {
-                MethodCoverage methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
+                MethodDTO methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
                 methodLineCoverage = methodCoverage != null ? methodCoverage.lines : Collections.emptyList();
             }
 
