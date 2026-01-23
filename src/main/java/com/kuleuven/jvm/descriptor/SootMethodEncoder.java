@@ -9,12 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class SootMethodEncoder {
+    /**
+     * Converts a fully qualified method signature (e.g., \<com.java.Foo: int bar(int)>)
+     * to its JVM method full name (e.g., com/java/Foo.bar(I)I).
+     *
+     * @param fullyQualifiedMethodSignature The fully qualified method signature.
+     * @return The JVM method full name.
+     */
     public static String toJvmMethodFullName(String fullyQualifiedMethodSignature) {
         String s = fullyQualifiedMethodSignature.trim();
         s = s.substring(1, s.length() - 1); // remove < >
 
         int colon = s.indexOf(':');
         String className = s.substring(0, colon).trim();
+        String jvmClassName = className.replace('.', '/');
         String rest = s.substring(colon + 1).trim();
 
         int space = rest.indexOf(' ');
@@ -38,7 +46,7 @@ public final class SootMethodEncoder {
 
         String descriptor = toJvmMethodDescriptor(paramTypes, returnType);
 
-        return className + "." + methodName + descriptor;
+        return jvmClassName + "." + methodName + descriptor;
     }
 
 

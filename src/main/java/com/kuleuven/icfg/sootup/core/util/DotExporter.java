@@ -26,8 +26,7 @@ import com.google.common.collect.Sets;
 
 import java.util.*;
 
-import com.kuleuven.coverage.CoverageAgent.shared.StmtId;
-import com.kuleuven.icfg.coverage.CoverageBlockInfo;
+import com.kuleuven.coverage.intellij.model.coverage.LineCoverage;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -53,7 +52,7 @@ public class DotExporter {
             MethodSignature methodSignature,
             Set<MethodSignature> methodSignatures,
             boolean compact,
-            @Nullable Map<Integer, CoverageBlockInfo> coverageBlockMap) {
+            @Nullable List<LineCoverage> methodLineCoverage) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
         // starting stmt at the top;
@@ -82,23 +81,17 @@ public class DotExporter {
         for (BasicBlock<?> block : blocks) {
             StringBuilder coverageLabelSb = new StringBuilder();
             StringBuilder coverageStyleSb = new StringBuilder();
-            if (coverageBlockMap != null) {
-                Stmt entryStmt = block.getHead();
-                CoverageBlockInfo blockInfo = findBlockInfoByStmt(entryStmt, coverageBlockMap);
-
-                if (blockInfo != null) {
-                    int coverageCount = blockInfo.coverageCount();
-                    coverageLabelSb
-                            .append("\t\tlabel = \"Block #")
-                            .append(blockInfo.blockInfo().blockId())
-                            .append("\t|\thits=").append(coverageCount)
-                            .append("\"\n");
-                    String blockColor = getBlockColor(coverageCount);
-                    coverageStyleSb
-                            .append("\t\tstyle = filled\n")
-                            .append("\t\tcolor = ").append(blockColor).append("\n")
-                            .append("\t\tfontsize = 12\n");
-                }
+            if (methodLineCoverage != null) {
+                int coverageCount = getCoverageCount(block, methodLineCoverage);
+                coverageLabelSb
+                        .append("\t\tlabel = \"coverage: ")
+                        .append(coverageCount > 0 ? "full" : "uncovered")
+                        .append("\"\n");
+                String blockColor = getBlockColor(coverageCount);
+                coverageStyleSb
+                        .append("\t\tstyle = filled\n")
+                        .append("\t\tcolor = ").append(blockColor).append("\n")
+                        .append("\t\tfontsize = 12\n");
             }
 
             sb.append("//  lines [")
@@ -257,14 +250,16 @@ public class DotExporter {
         return sb;
     }
 
-    private static CoverageBlockInfo findBlockInfoByStmt(Stmt stmt, Map<Integer, CoverageBlockInfo> coverageBlockMap) {
-        String stmtId = StmtId.getStmtId(stmt);
-        for (CoverageBlockInfo coverageBlockInfo : coverageBlockMap.values()) {
-            if (coverageBlockInfo.blockInfo().stmtId().equals(stmtId)) {
-                return coverageBlockInfo;
+    private static int getCoverageCount(BasicBlock<?> block, List<LineCoverage> methodLineCoverage) {
+        // TODO: Can we assume that the first line of the first statement represents the block's whole coverage?
+        int lineNumber = block.getHead().getPositionInfo().getStmtPosition().getFirstLine();
+
+        for (LineCoverage lineCoverage : methodLineCoverage) {
+            if (lineCoverage.lineNumber == lineNumber) {
+                return lineCoverage.hits;
             }
         }
-        return null;
+        return 0;
     }
 
     private static String getBlockColor(int hits) {
