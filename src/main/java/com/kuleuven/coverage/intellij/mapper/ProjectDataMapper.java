@@ -6,8 +6,7 @@ import com.intellij.rt.coverage.data.instructions.JumpInstructions;
 import com.intellij.rt.coverage.data.instructions.LineInstructions;
 import com.intellij.rt.coverage.data.instructions.SwitchInstructions;
 import com.intellij.rt.coverage.util.ArrayUtil;
-import com.kuleuven.coverage.intellij.model.*;
-import com.kuleuven.coverage.intellij.model.coverage.*;
+import com.kuleuven.coverage.model.*;
 
 import java.util.List;
 import java.util.Map;

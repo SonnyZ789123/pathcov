@@ -2,7 +2,7 @@ package com.kuleuven.coverage.intellij.shared;
 
 import com.google.gson.Gson;
 import com.kuleuven.coverage.CoverageReport;
-import com.kuleuven.coverage.intellij.model.CoverageReportDTO;
+import com.kuleuven.coverage.model.CoverageReportDTO;
 
 import java.io.IOException;
 import java.io.Reader;

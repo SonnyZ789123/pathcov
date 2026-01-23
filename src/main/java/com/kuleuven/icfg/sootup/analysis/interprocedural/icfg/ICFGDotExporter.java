@@ -26,8 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.kuleuven.coverage.CoverageReport;
-import com.kuleuven.coverage.intellij.model.LineDTO;
-import com.kuleuven.coverage.intellij.model.MethodDTO;
+import com.kuleuven.coverage.model.LineDTO;
+import com.kuleuven.coverage.model.MethodDTO;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;

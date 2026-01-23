@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 import java.util.*;
 
-import com.kuleuven.coverage.intellij.model.LineDTO;
+import com.kuleuven.coverage.model.LineDTO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
