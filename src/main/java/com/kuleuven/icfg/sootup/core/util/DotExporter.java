@@ -46,6 +46,12 @@ import sootup.core.types.ClassType;
  * @author Markus Schmidt, Yoran Mertens
  */
 public class DotExporter {
+    private enum CoverageType {
+        FULL,
+        PARTIAL,
+        NONE
+    }
+
     public static String buildGraph(
             @NonNull ControlFlowGraph<?> graph,
             Map<Integer, MethodSignature> calls,
@@ -82,15 +88,12 @@ public class DotExporter {
             StringBuilder coverageLabelSb = new StringBuilder();
             StringBuilder coverageStyleSb = new StringBuilder();
             if (methodLineCoverage != null) {
-                int coverageCount = getCoverageCount(block, methodLineCoverage);
+                CoverageType blockCoverageType = getBlockCoverageType(block, methodLineCoverage);
                 coverageLabelSb
-                        .append("\t\tlabel = \"coverage: ")
-                        .append(coverageCount > 0 ? "full" : "uncovered")
-                        .append("\"\n");
-                String blockColor = getBlockColor(coverageCount);
+                        .append("\t\tlabel = \"").append(getBlockLabel(blockCoverageType)).append("\"\n");
                 coverageStyleSb
                         .append("\t\tstyle = filled\n")
-                        .append("\t\tcolor = ").append(blockColor).append("\n")
+                        .append("\t\tcolor = ").append(getBlockColor(blockCoverageType)).append("\n")
                         .append("\t\tfontsize = 12\n");
             }
 
@@ -250,26 +253,47 @@ public class DotExporter {
         return sb;
     }
 
-    private static int getCoverageCount(BasicBlock<?> block, List<LineDTO> methodLineCoverage) {
+    private static CoverageType getBlockCoverageType(BasicBlock<?> block, List<LineDTO> methodLineCoverage) {
         // TODO: Can we assume that the first line of the first statement represents the block's whole coverage?
         int lineNumber = block.getHead().getPositionInfo().getStmtPosition().getFirstLine();
 
         for (LineDTO lineCoverage : methodLineCoverage) {
             if (lineCoverage.line == lineNumber) {
-                return lineCoverage.hits;
+                return getCoverageType(lineCoverage);
             }
         }
-        return 0;
+        return CoverageType.NONE;
     }
 
-    private static String getBlockColor(int hits) {
-        if (hits == 0) {
-            return "lightcoral";
-        } else if (hits <= 2) {
-            return "khaki1";
-        } else {
-            return "palegreen3";
+    private static CoverageType getCoverageType(LineDTO line) {
+        // uncovered
+        if (line.hits == 0) {
+            return CoverageType.NONE;
         }
+
+        // partially covered
+        if (line.branches.covered != line.branches.total) {
+            return CoverageType.PARTIAL;
+        }
+
+        // fully covered
+        return CoverageType.FULL;
+    }
+
+    private static String getBlockLabel(CoverageType coverageType) {
+        return switch (coverageType) {
+            case NONE -> "uncovered";
+            case PARTIAL -> "partially covered";
+            case FULL -> "fully covered";
+        };
+    }
+
+    private static String getBlockColor(CoverageType coverageType) {
+        return switch (coverageType) {
+            case NONE -> "lightcoral";
+            case PARTIAL -> "khaki1";
+            case FULL -> "palegreen3";
+        };
     }
 }
 
