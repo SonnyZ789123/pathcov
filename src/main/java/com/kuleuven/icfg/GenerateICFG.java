@@ -2,12 +2,12 @@ package com.kuleuven.icfg;
 
 import com.github.javaparser.quality.Nullable;
 import com.kuleuven.config.AppConfig;
-import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class GenerateICFG {
     public static void main(String[] args) {
@@ -16,18 +16,22 @@ public class GenerateICFG {
          *   0: classPath              (e.g., "./target/classes")
          *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
          *   2: outputPath             (e.g., "./out/visualization/icfg/icfg.dot")
+         *   3: projectPrefixes        (e.g., "com.kuleuven,test.features")
          */
         if (args.length < 2) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> [outputPath]");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
         String outputPath = args.length >= 3 ? args[2] : null;
+        List<String> projectPrefixes = args.length >= 4
+                ? List.of(args[3].split(","))
+                : null;
 
         try {
-            Generator generator = new Generator(classPath, fullyQualifiedMethodSignature);
+            Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
 
             writeOutputs(generator.dotExport(), outputPath);
         } catch (IOException e) {

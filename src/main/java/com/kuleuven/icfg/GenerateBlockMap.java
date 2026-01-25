@@ -46,7 +46,7 @@ public class GenerateBlockMap {
     }
 
     private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature, @Nullable List<String> projectPrefixes) {
-        Generator generator = new Generator(classPath, entryFQMethodSignature);
+        Generator generator = new Generator(classPath, entryFQMethodSignature, projectPrefixes);
 
         JimpleBasedInterproceduralCFG icfg = generator.getICfg();
         CallGraph callGraph = icfg.getCg();

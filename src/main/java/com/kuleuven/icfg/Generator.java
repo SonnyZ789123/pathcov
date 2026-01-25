@@ -1,7 +1,10 @@
 package com.kuleuven.icfg;
 
+import com.kuleuven.cg.SootUpCGWrapper;
 import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
+import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
+import sootup.callgraph.CallGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -9,15 +12,19 @@ import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 
 public class Generator {
     public JavaView view;
-    public JavaSootMethod method;
-    private JimpleBasedInterproceduralCFG icfg;
+    private final JavaSootMethod method;
+    private final JimpleBasedInterproceduralCFG icfg;
+    @Nullable private final List<String> projectPrefixes;
 
-    public Generator(String classPath, String fullyQualifiedMethodSignature) {
+    public Generator(String classPath, String fullyQualifiedMethodSignature, @Nullable List<String> projectPrefixes) {
+        this.projectPrefixes = projectPrefixes;
+
         // Load classes from the given classpath
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         this.view = new JavaView(inputLocation);
@@ -37,23 +44,23 @@ public class Generator {
         }
 
         this.method = opt.get();
-    }
 
-    public JimpleBasedInterproceduralCFG getICfg() {
-        if (icfg != null) {
-            return icfg;
-        }
-
-        icfg = new JimpleBasedInterproceduralCFG(
+        this.icfg = new JimpleBasedInterproceduralCFG(
                 view,
                 Collections.singletonList(method.getSignature()),
                 false, false);
+    }
 
+    public JimpleBasedInterproceduralCFG getICfg() {
         return icfg;
     }
 
     public String dotExport() {
-        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg());
+        CallGraph callGraph = getICfg().getCg();
+        SootUpCGWrapper cgWrapper = new SootUpCGWrapper(callGraph, projectPrefixes);
+
+        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg(), cgWrapper);
+
         return builder.buildICFGGraph(false);
     }
 }

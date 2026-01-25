@@ -23,9 +23,10 @@ public class GenerateCoverageGraph {
          *   2: coverageDataPath       (e.g., "out/coverage.json")
          *   3: blockMapPath           (e.g., "./output/block_map.json")
          *   4: outputPath             (e.g., "/data/coverage_graph.dot")
+         *   5: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
          */
         if (args.length < 3) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <coverageDataPath> [blockMapPath] [outputPath]");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <coverageDataPath> [blockMapPath] [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
@@ -34,6 +35,9 @@ public class GenerateCoverageGraph {
         String coverageDataPath = args[2];
         String blockMapPath = args.length >= 4 ? args[3] : null;
         String outputPath = args.length >= 5 ? args[4] : null;
+        List<String> projectPrefixes = args.length >= 6
+                ? List.of(args[5].split(","))
+                : null;
 
         Map<Integer, BlockInfo> blockMap = null;
         try {
@@ -45,7 +49,7 @@ public class GenerateCoverageGraph {
 
         try {
             CoverageDataReader reader = new CoverageDataReader(coverageDataPath);
-            Generator generator = new Generator(classPath, fullyQualifiedMethodSignature);
+            Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
             BuildICFGGraph builder = new BuildICFGGraph(generator.view, icfg, reader.getCoverageReport());
