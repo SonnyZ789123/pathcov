@@ -1,6 +1,7 @@
 package com.kuleuven.cg;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import sootup.callgraph.CallGraph;
 import sootup.core.signatures.MethodSignature;
 
@@ -13,7 +14,7 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     private final Set<MethodSignature> nodes;
     private final Set<SootUpCallWrapper> edges;
 
-    public SootUpCGWrapper(CallGraph callGraph, List<String> projectPrefixes) {
+    public SootUpCGWrapper(CallGraph callGraph, @Nullable List<String> projectPrefixes) {
         ProjectMethodFilter filter = new ProjectMethodFilter(projectPrefixes);
         this.callGraph = callGraph;
 

@@ -1,17 +1,17 @@
 package com.kuleuven.cg;
 
+import org.jspecify.annotations.Nullable;
 import sootup.callgraph.CallGraph;
 import sootup.core.signatures.MethodSignature;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProjectMethodFilter {
-    private final List<String> projectPrefixes;
+    private final List<String> projectPrefixes = new ArrayList<>();
     private final List<String> blacklistPrefixes = List.of(
             "java.",
             "javax.",
@@ -32,12 +32,10 @@ public class ProjectMethodFilter {
             "ch.qos.logback."
     );
 
-    public ProjectMethodFilter() {
-        this.projectPrefixes = Collections.emptyList();
-    }
-
-    public ProjectMethodFilter(List<String> projectPrefixes) {
-        this.projectPrefixes = new ArrayList<>();
+    public ProjectMethodFilter(@Nullable List<String> projectPrefixes) {
+        if (projectPrefixes == null) {
+            return;
+        }
         // Replace possible "/" with "."
         for (String prefix : projectPrefixes) {
             this.projectPrefixes.add(prefix.replace('/', '.').trim());
