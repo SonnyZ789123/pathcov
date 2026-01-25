@@ -2,6 +2,7 @@ package com.kuleuven.icfg;
 
 import com.kuleuven.cg.SootUpCGWrapper;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
+import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
 import sootup.core.model.SootMethod;
@@ -32,7 +33,7 @@ public class GenerateBlockMap {
         String outputPath = args.length >= 3 ? args[2] : null;
         List<String> projectPrefixes = args.length >= 4
                 ? List.of(args[3].split(","))
-                : List.of();
+                : null;
 
         BlockInfoByIdMap blockMap = createICfgBlockMap(classPath, entryFQMethodSignature, projectPrefixes);
 
@@ -44,7 +45,7 @@ public class GenerateBlockMap {
         }
     }
 
-    private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature, List<String> projectPrefixes) {
+    private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature, @Nullable List<String> projectPrefixes) {
         Generator generator = new Generator(classPath, entryFQMethodSignature);
 
         JimpleBasedInterproceduralCFG icfg = generator.getICfg();
