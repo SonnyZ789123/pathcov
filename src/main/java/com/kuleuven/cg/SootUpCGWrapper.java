@@ -68,6 +68,11 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
         return this.callGraph.getEntryMethods();
     }
 
+    @Override
+    public boolean containsMethod(@NonNull MethodSignature method) {
+        return this.nodes.contains(method);
+    }
+
     private static class SootUpCallWrapper implements Edge<MethodSignature> {
         CallGraph.Call call;
 
