@@ -1,6 +1,6 @@
 package com.kuleuven.icfg;
 
-import com.kuleuven.cg.SootUpCGWrapper;
+import com.kuleuven.cg.ReducedCallGraph;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
 import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
@@ -51,8 +51,8 @@ public class GenerateBlockMap {
         JimpleBasedInterproceduralCFG icfg = generator.getICfg();
         CallGraph callGraph = icfg.getCg();
 
-        SootUpCGWrapper cgWrapper = new SootUpCGWrapper(callGraph, projectPrefixes);
-        Set<MethodSignature> methodSignatures = cgWrapper.getNodes();
+        ReducedCallGraph reducedCallGraph = new ReducedCallGraph(callGraph, projectPrefixes);
+        Set<MethodSignature> methodSignatures = reducedCallGraph.getMethodSignatures();
 
         List<SootMethod> methods = methodSignatures.stream()
                 .map(sig -> generator.getView().getMethod(sig))

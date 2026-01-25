@@ -25,7 +25,7 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kuleuven.cg.SootUpCGWrapper;
+import com.kuleuven.cg.ReducedCallGraph;
 import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.model.LineDTO;
 import com.kuleuven.coverage.model.MethodDTO;
@@ -54,7 +54,7 @@ public class ICFGDotExporter {
     public static String buildICFGGraph(
             Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph,
             View view,
-            SootUpCGWrapper callGraph,
+            ReducedCallGraph callGraph,
             boolean compact,
             @Nullable CoverageReport coverageReport) {
         final StringBuilder sb = new StringBuilder();
@@ -92,7 +92,7 @@ public class ICFGDotExporter {
     public static Map<Integer, MethodSignature> computeCalls(
             Map<MethodSignature, ControlFlowGraph<?>> controlFlowGraphSet,
             View view,
-            SootUpCGWrapper callgraph) {
+            ReducedCallGraph callgraph) {
         Map<Integer, MethodSignature> calls = new HashMap<>();
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry : controlFlowGraphSet.entrySet()) {
             ControlFlowGraph<?> controlFlowGraph = entry.getValue();
@@ -147,7 +147,7 @@ public class ICFGDotExporter {
     }
 
     public static Set<MethodSignature> getMethodSignatureInSubClass(
-            MethodSignature source, MethodSignature target, SootUpCGWrapper callGraph) {
+            MethodSignature source, MethodSignature target, ReducedCallGraph callGraph) {
         if (!callGraph.containsMethod(source) || !callGraph.containsMethod(target)) {
             return Collections.emptySet();
         }
@@ -164,7 +164,7 @@ public class ICFGDotExporter {
             MethodSignature target,
             View view,
             Map<Integer, MethodSignature> calls,
-            SootUpCGWrapper callgraph) {
+            ReducedCallGraph callgraph) {
         Set<MethodSignature> methodSignatureInSubClass =
                 getMethodSignatureInSubClass(source, target, callgraph);
         methodSignatureInSubClass.forEach(
