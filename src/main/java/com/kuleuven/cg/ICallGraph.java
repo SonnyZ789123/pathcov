@@ -16,11 +16,13 @@ public interface ICallGraph<NodeType> {
 
     Set<? extends Edge<NodeType>> callsTo(NodeType node);
 
-    @NonNull Set<MethodSignature> callTargetsFrom(@NonNull MethodSignature var1);
+    @NonNull Set<MethodSignature> callTargetsFrom(@NonNull MethodSignature sourceMethod);
 
-    @NonNull Set<MethodSignature> callSourcesTo(@NonNull MethodSignature var1);
+    @NonNull Set<MethodSignature> callSourcesTo(@NonNull MethodSignature targetMethod);
 
     List<MethodSignature> getEntryMethods();
+
+    boolean containsMethod(@NonNull MethodSignature method);
 
     interface Edge<N> {
         N getSource();
