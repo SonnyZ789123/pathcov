@@ -55,7 +55,7 @@ public class GenerateBlockMap {
         Set<MethodSignature> methodSignatures = cgWrapper.getNodes();
 
         List<SootMethod> methods = methodSignatures.stream()
-                .map(sig -> generator.view.getMethod(sig))
+                .map(sig -> generator.getView().getMethod(sig))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
