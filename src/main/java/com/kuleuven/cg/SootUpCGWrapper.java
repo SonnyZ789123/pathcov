@@ -1,6 +1,5 @@
 package com.kuleuven.cg;
 
-import com.kuleuven.config.AppConfig;
 import sootup.callgraph.CallGraph;
 import sootup.core.signatures.MethodSignature;
 
