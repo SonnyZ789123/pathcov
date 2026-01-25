@@ -17,7 +17,7 @@ import java.util.Optional;
 
 
 public class Generator {
-    public JavaView view;
+    private final JavaView view;
     private final JavaSootMethod method;
     private final JimpleBasedInterproceduralCFG icfg;
     @Nullable private final List<String> projectPrefixes;
@@ -53,6 +53,14 @@ public class Generator {
 
     public JimpleBasedInterproceduralCFG getICfg() {
         return icfg;
+    }
+
+    public JavaView getView() {
+        return view;
+    }
+
+    public JavaSootMethod getMethod() {
+        return method;
     }
 
     public String dotExport() {
