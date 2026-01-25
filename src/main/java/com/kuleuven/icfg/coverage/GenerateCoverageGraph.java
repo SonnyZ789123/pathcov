@@ -1,6 +1,7 @@
 package com.kuleuven.icfg.coverage;
 
 import com.github.javaparser.quality.Nullable;
+import com.kuleuven.cg.SootUpCGWrapper;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.intellij.shared.CoverageDataReader;
 import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
@@ -52,7 +53,11 @@ public class GenerateCoverageGraph {
             Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
-            BuildICFGGraph builder = new BuildICFGGraph(generator.getView(), icfg, reader.getCoverageReport());
+            // Filter only project classes in ICFG
+            SootUpCGWrapper cgWrapper = new SootUpCGWrapper(icfg.getCg(), projectPrefixes);
+
+            BuildICFGGraph builder = new BuildICFGGraph(
+                    generator.getView(), icfg, cgWrapper, reader.getCoverageReport());
             String icfgAsDot = builder.buildICFGGraph(true);
 
             writeOutputs(icfgAsDot, outputPath);
