@@ -1,10 +1,12 @@
 package com.kuleuven.cg;
 
+import org.jspecify.annotations.NonNull;
 import sootup.callgraph.CallGraph;
 import sootup.core.signatures.MethodSignature;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     private final CallGraph callGraph;
@@ -21,7 +23,7 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
         this.nodes = filter.filterMethods(methodSignatures);
         this.edges = filter.filterCalls(calls).stream()
                 .map(SootUpCallWrapper::new)
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -38,18 +40,24 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     public Set<? extends Edge<MethodSignature>> callsFrom(MethodSignature node) {
         return callGraph.callsFrom(node).stream()
                 .map(SootUpCallWrapper::new)
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<? extends Edge<MethodSignature>> callsTo(MethodSignature node) {
         return callGraph.callsTo(node).stream()
                 .map(SootUpCallWrapper::new)
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
-    public CallGraph getSootUpCallGraph() {
-        return this.callGraph;
+    @Override
+    public @NonNull Set<MethodSignature> callTargetsFrom(@NonNull MethodSignature sourceMethod) {
+        return this.callsFrom(sourceMethod).stream().map(Edge::getTarget).collect(Collectors.toSet());
+    }
+
+    @Override
+    public @NonNull Set<MethodSignature> callSourcesTo(@NonNull MethodSignature targetMethod) {
+        return this.callsTo(targetMethod).stream().map(Edge::getSource).collect(Collectors.toSet());
     }
 
     private static class SootUpCallWrapper implements Edge<MethodSignature> {

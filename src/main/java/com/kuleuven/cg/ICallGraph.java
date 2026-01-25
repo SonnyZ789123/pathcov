@@ -1,5 +1,8 @@
 package com.kuleuven.cg;
 
+import org.jspecify.annotations.NonNull;
+import sootup.core.signatures.MethodSignature;
+
 import java.util.Set;
 
 public interface ICallGraph<NodeType> {
@@ -11,6 +14,10 @@ public interface ICallGraph<NodeType> {
     Set<? extends Edge<NodeType>> callsFrom(NodeType node);
 
     Set<? extends Edge<NodeType>> callsTo(NodeType node);
+
+    @NonNull Set<MethodSignature> callTargetsFrom(@NonNull MethodSignature var1);
+
+    @NonNull Set<MethodSignature> callSourcesTo(@NonNull MethodSignature var1);
 
     interface Edge<N> {
         N getSource();
