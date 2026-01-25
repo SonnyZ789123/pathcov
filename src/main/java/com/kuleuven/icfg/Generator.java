@@ -1,6 +1,6 @@
 package com.kuleuven.icfg;
 
-import com.kuleuven.cg.SootUpCGWrapper;
+import com.kuleuven.cg.ReducedCallGraph;
 import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
@@ -65,9 +65,9 @@ public class Generator {
 
     public String dotExport() {
         CallGraph callGraph = getICfg().getCg();
-        SootUpCGWrapper cgWrapper = new SootUpCGWrapper(callGraph, projectPrefixes);
+        ReducedCallGraph reducedCallGraph = new ReducedCallGraph(callGraph, projectPrefixes);
 
-        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg(), cgWrapper);
+        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg(), reducedCallGraph);
 
         return builder.buildICFGGraph(false);
     }
