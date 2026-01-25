@@ -24,9 +24,9 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 
 import java.util.*;
 
+import com.kuleuven.cg.SootUpCGWrapper;
 import com.kuleuven.coverage.CoverageReport;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
-import sootup.callgraph.CallGraph;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.model.SootMethod;
 import sootup.core.signatures.MethodSignature;
@@ -40,26 +40,31 @@ public class BuildICFGGraph {
 
     private final View view;
     private final JimpleBasedInterproceduralCFG icfg;
+    private final SootUpCGWrapper callGraph;
     private final CoverageReport coverageReport;
 
-    public BuildICFGGraph(View view, JimpleBasedInterproceduralCFG icfg) {
+    public BuildICFGGraph(View view, JimpleBasedInterproceduralCFG icfg, SootUpCGWrapper callGraph) {
         this.view = view;
         this.icfg = icfg;
+        this.callGraph = callGraph;
         this.coverageReport = null;
     }
 
     public BuildICFGGraph(
             View view,
             JimpleBasedInterproceduralCFG icfg,
+            SootUpCGWrapper callGraph,
             CoverageReport coverageReport) {
         this.view = view;
         this.icfg = icfg;
+        this.callGraph = callGraph;
         this.coverageReport = coverageReport;
     }
 
     public String buildICFGGraph(boolean compact) {
-        CallGraph callGraph = icfg.getCg();
         Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph = new LinkedHashMap<>();
+        // TODO: make the SootUpCGWrapper implement the CallGraph interface directly to avoid this conversion.
+        // see implementation of BuildICFGGraph in SootUp v2.0.1
         computeAllCalls(callGraph.getEntryMethods(), signatureToControlFlowGraph, callGraph);
         return ICFGDotExporter.buildICFGGraph(signatureToControlFlowGraph, view, callGraph, compact, coverageReport);
     }
@@ -67,7 +72,7 @@ public class BuildICFGGraph {
     public void computeAllCalls(
             List<MethodSignature> entryPoints,
             Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph,
-            CallGraph callGraph) {
+            SootUpCGWrapper callGraph) {
         ArrayList<MethodSignature> visitedMethods = new ArrayList<>();
         computeAllCalls(entryPoints, signatureToControlFlowGraph, callGraph, visitedMethods);
     }
@@ -75,7 +80,7 @@ public class BuildICFGGraph {
     private void computeAllCalls(
             List<MethodSignature> entryPoints,
             Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph,
-            CallGraph callGraph,
+            SootUpCGWrapper callGraph,
             List<MethodSignature> visitedMethods) {
         visitedMethods.addAll(entryPoints);
         for (MethodSignature methodSignature : entryPoints) {
