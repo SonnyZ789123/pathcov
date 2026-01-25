@@ -5,6 +5,7 @@ import sootup.callgraph.CallGraph;
 import sootup.core.signatures.MethodSignature;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,10 +43,8 @@ public class ProjectMethodFilter {
         }
     }
 
-    public Set<MethodSignature> filterMethods(Set<MethodSignature> methodSignatures) {
-        return methodSignatures.stream()
-                .filter(this::isProjectMethod)
-                .collect(Collectors.toSet());
+    public Stream<MethodSignature> filterMethods(Collection<MethodSignature> methodSignatures) {
+        return methodSignatures.stream().filter(this::isProjectMethod);
     }
 
     public Set<CallGraph.Call> filterCalls(Set<CallGraph.Call> calls) {

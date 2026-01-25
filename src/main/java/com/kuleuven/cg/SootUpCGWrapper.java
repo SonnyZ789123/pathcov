@@ -13,6 +13,7 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     private final CallGraph callGraph;
     private final Set<MethodSignature> nodes;
     private final Set<SootUpCallWrapper> edges;
+    private final List<MethodSignature> entryMethods;
 
     public SootUpCGWrapper(CallGraph callGraph, @Nullable List<String> projectPrefixes) {
         ProjectMethodFilter filter = new ProjectMethodFilter(projectPrefixes);
@@ -21,7 +22,8 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
         Set<MethodSignature> methodSignatures = callGraph.getMethodSignatures();
         Set<CallGraph.Call> calls = callGraph.getCalls();
 
-        this.nodes = filter.filterMethods(methodSignatures);
+        this.entryMethods = filter.filterMethods(callGraph.getEntryMethods()).collect(Collectors.toList());
+        this.nodes = filter.filterMethods(methodSignatures).collect(Collectors.toSet());
         this.edges = filter.filterCalls(calls).stream()
                 .map(SootUpCallWrapper::new)
                 .collect(Collectors.toSet());
@@ -59,6 +61,11 @@ public class SootUpCGWrapper implements ICallGraph<MethodSignature> {
     @Override
     public @NonNull Set<MethodSignature> callSourcesTo(@NonNull MethodSignature targetMethod) {
         return this.callsTo(targetMethod).stream().map(Edge::getSource).collect(Collectors.toSet());
+    }
+
+    @Override
+    public @NonNull List<MethodSignature> getEntryMethods() {
+        return this.callGraph.getEntryMethods();
     }
 
     private static class SootUpCallWrapper implements Edge<MethodSignature> {
