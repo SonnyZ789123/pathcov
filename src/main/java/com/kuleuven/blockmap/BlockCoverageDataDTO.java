@@ -25,6 +25,14 @@ public class BlockCoverageDataDTO {
         this.coverageState = coverageState;
     }
 
+    public List<LineDTO> getLines() {
+        return lines;
+    }
+
+    public CoverageState getCoverageState() {
+        return coverageState;
+    }
+
     public static BlockCoverageDataDTO createEmpty() {
         return new BlockCoverageDataDTO(Collections.emptyList(), CoverageState.NOT_COVERED);
     }
