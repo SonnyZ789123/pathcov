@@ -51,30 +51,23 @@ public class GenerateCoverageGraph {
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
             BuildICFGGraph builder = new BuildICFGGraph(generator.getView(), icfg, new BlockCoverageMap(blockMap));
-            String icfgAsDot = builder.buildICFGGraph(true);
+            String coverageGraphAsDot = builder.buildICFGGraph(true);
 
-            writeOutputs(icfgAsDot, outputPath);
+            writeOutputs(coverageGraphAsDot, outputPath);
         } catch (IOException e) {
             System.err.println("❌ Failed to write coverage graph: " + e.getMessage());
             System.exit(1);
         }
     }
 
-    /**
-     * Writes the interprocedural control flow graph's DOT representation.
-     *
-     * @param icfgAsDot The interprocedural control flow graph to write
-     * @param outputPath The optional output path
-     * @throws IOException If writing fails
-     */
-    private static void writeOutputs(String icfgAsDot, @Nullable String outputPath) throws IOException {
+    private static void writeOutputs(String coverageGraphAsDot, @Nullable String outputPath) throws IOException {
         String writeOutputPath = outputPath != null ? outputPath : AppConfig.get("coverage.icfg.write.path");
 
         Path output = Path.of(writeOutputPath);
         Files.createDirectories(output.getParent());
 
         try (FileWriter writer = new FileWriter(output.toFile())) {
-            writer.write(icfgAsDot);
+            writer.write(coverageGraphAsDot);
             System.out.println("✅ ICFG coverage DOT file written to " + output);
         }
     }
