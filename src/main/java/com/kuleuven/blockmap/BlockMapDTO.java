@@ -9,4 +9,8 @@ public class BlockMapDTO {
     public BlockMapDTO(List<MethodBlockMapDTO> methodBlockMaps) {
         this.methodBlockMaps = methodBlockMaps;
     }
+
+    public List<MethodBlockMapDTO> getMethodBlockMaps() {
+        return methodBlockMaps;
+    }
 }

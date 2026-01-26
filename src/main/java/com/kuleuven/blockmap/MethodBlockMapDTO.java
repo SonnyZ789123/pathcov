@@ -11,4 +11,12 @@ public class MethodBlockMapDTO {
         this.fullName = fullName;
         this.blocks = blocks;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public List<BlockDataDTO> getBlocks() {
+        return blocks;
+    }
 }

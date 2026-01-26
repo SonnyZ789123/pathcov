@@ -21,4 +21,24 @@ public class BlockDataDTO {
         this.parentBlockId = predecessorBlockIds;
         this.successorBlockIds = successorBlockIds;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getSourceHash() {
+        return sourceHash;
+    }
+
+    public BlockCoverageDataDTO getCoverageData() {
+        return coverageData;
+    }
+
+    public List<Integer> getParentBlockId() {
+        return parentBlockId;
+    }
+
+    public List<Integer> getSuccessorBlockIds() {
+        return successorBlockIds;
+    }
 }
