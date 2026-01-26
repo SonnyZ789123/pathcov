@@ -62,69 +62,17 @@ public class ProjectMethodFilter {
                     return true;
                 }
             }
+
+            return false;
         } else {
+            // Default: omit standard library and well-known third-party libs
             for (String prefix : blacklistPrefixes) {
                 if (className.startsWith(prefix)) {
                     return false;
                 }
             }
+
+            return true;
         }
-
-        return true;
-    }
-
-    public Stream<String> filterMethodsFromDotFile(Stream<String> dotFileStream) {
-        return dotFileStream.filter(line -> {
-
-            // Keep non-edge lines (headers, closing brace, etc.)
-            if (!line.contains("->")) {
-                return true;
-            }
-
-            // Extract quoted strings "<A>" -> "<B>"
-            int q1 = line.indexOf('"');
-            int q2 = line.indexOf('"', q1 + 1);
-            int q3 = line.indexOf('"', q2 + 1);
-            int q4 = line.indexOf('"', q3 + 1);
-
-            if (q1 < 0 || q2 < 0 || q3 < 0 || q4 < 0) {
-                return true; // malformed line, keep it
-            }
-
-            String srcRaw = line.substring(q1 + 1, q2);
-            String tgtRaw = line.substring(q3 + 1, q4);
-
-            // Extract class names (e.g. com.kuleuven.library.Main)
-            String srcClass = extractClassName(srcRaw);
-            String tgtClass = extractClassName(tgtRaw);
-
-            // Keep only if both src and target belong to the project
-            return isProjectClassName(srcClass) && isProjectClassName(tgtClass);
-        });
-    }
-
-    private String extractClassName(String rawMethod) {
-        // rawMethod example:
-        // <com.kuleuven.library.Main: void main(java.lang.String[])>
-
-        // Remove surrounding <>
-        if (rawMethod.startsWith("<") && rawMethod.endsWith(">")) {
-            rawMethod = rawMethod.substring(1, rawMethod.length() - 1);
-        }
-
-        // Everything before the colon is the class FQN
-        int colonIdx = rawMethod.indexOf(':');
-        if (colonIdx == -1) {
-            return ""; // malformed -> treat as non-project
-        }
-
-        return rawMethod.substring(0, colonIdx).trim();
-    }
-
-    private boolean isProjectClassName(String className) {
-        if (!projectPrefixes.isEmpty()) {
-            return projectPrefixes.stream().anyMatch(className::startsWith);
-        }
-        return blacklistPrefixes.stream().noneMatch(className::startsWith);
     }
 }
