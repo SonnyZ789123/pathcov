@@ -5,7 +5,7 @@ import com.kuleuven.coverage.model.LineDTO;
 import java.util.Collections;
 import java.util.List;
 
-public class BlockCoverageData {
+public class BlockCoverageDataDTO {
     public enum CoverageState {
         COVERED,
         NOT_COVERED,
@@ -15,18 +15,18 @@ public class BlockCoverageData {
     private final List<LineDTO> lines;
     private final CoverageState coverageState;
 
-    public BlockCoverageData(List<LineDTO> lines) {
+    public BlockCoverageDataDTO(List<LineDTO> lines) {
         this.lines = lines;
         this.coverageState = determineCoverageState(lines);
     }
 
-    private BlockCoverageData(List<LineDTO> lines,CoverageState coverageState) {
+    private BlockCoverageDataDTO(List<LineDTO> lines, CoverageState coverageState) {
         this.lines = lines;
         this.coverageState = coverageState;
     }
 
-    public static BlockCoverageData createEmpty() {
-        return new BlockCoverageData(Collections.emptyList(), CoverageState.NOT_COVERED);
+    public static BlockCoverageDataDTO createEmpty() {
+        return new BlockCoverageDataDTO(Collections.emptyList(), CoverageState.NOT_COVERED);
     }
 
     private CoverageState determineCoverageState(List<LineDTO> lineCoverageList) {

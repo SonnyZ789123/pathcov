@@ -24,10 +24,10 @@ public class BlockMapBuilder {
         this.coverageReport = coverageReport;
     }
 
-    public BlockMap build() {
+    public BlockMapDTO build() {
         initBlockToIdMap();
 
-        List<MethodBlockMap> methodBlockMaps = new ArrayList<>();
+        List<MethodBlockMapDTO> methodBlockMaps = new ArrayList<>();
         for (Map.Entry<SootMethod, ControlFlowGraph<?>> entry : methodToCfgMap.entrySet()) {
             SootMethod method = entry.getKey();
             ControlFlowGraph<?> cfg = entry.getValue();
@@ -35,11 +35,11 @@ public class BlockMapBuilder {
             String jvmFullName = SootMethodEncoder.toJvmMethodFullName(method.getSignature().toString());
             MethodDTO methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
 
-            List<BlockData> methodBlockData = buildBlockMapForMethod(cfg, methodCoverage);
-            methodBlockMaps.add(new MethodBlockMap(jvmFullName, methodBlockData));
+            List<BlockDataDTO> methodBlockData = buildBlockMapForMethod(cfg, methodCoverage);
+            methodBlockMaps.add(new MethodBlockMapDTO(jvmFullName, methodBlockData));
         }
 
-        return new BlockMap(methodBlockMaps);
+        return new BlockMapDTO(methodBlockMaps);
     }
 
     private void initBlockToIdMap() {
@@ -54,17 +54,17 @@ public class BlockMapBuilder {
         }
     }
 
-    private List<BlockData> buildBlockMapForMethod(ControlFlowGraph<?> cfg, @Nullable MethodDTO methodCoverage) {
-        List<BlockData> blockDataList = new ArrayList<>();
+    private List<BlockDataDTO> buildBlockMapForMethod(ControlFlowGraph<?> cfg, @Nullable MethodDTO methodCoverage) {
+        List<BlockDataDTO> blockDataList = new ArrayList<>();
 
         for (BasicBlock<?> block : cfg.getBlocks()) {
             int blockId = blockToIdMap.get(block);
             assert blockId != -1;
             // TODO: Compute actual source hash based on the actual source.
             String sourceHash = String.valueOf(block.hashCode());
-            BlockCoverageData blockCoverageData = methodCoverage != null ?
-                    new BlockCoverageData(getLineCoverageList(block, methodCoverage)) :
-                    BlockCoverageData.createEmpty();
+            BlockCoverageDataDTO blockCoverageData = methodCoverage != null ?
+                    new BlockCoverageDataDTO(getLineCoverageList(block, methodCoverage)) :
+                    BlockCoverageDataDTO.createEmpty();
 
             List<? extends BasicBlock<?>> parentBlocks = block.getPredecessors();
             List<? extends BasicBlock<?>> successorBlocks = block.getSuccessors();
@@ -74,7 +74,7 @@ public class BlockMapBuilder {
             List<Integer> successorBlockIds = successorBlocks.stream()
                     .map(blockToIdMap::get).filter(Objects::nonNull).toList();
 
-            BlockData blockData = new BlockData(
+            BlockDataDTO blockData = new BlockDataDTO(
                     blockId,
                     sourceHash,
                     blockCoverageData,

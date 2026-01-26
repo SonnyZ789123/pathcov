@@ -14,7 +14,7 @@ import java.util.*;
 
 public class BlockMapGenerator {
 
-    public static BlockMap generateBlockMap(
+    public static BlockMapDTO generateBlockMap(
             JavaView view, JimpleBasedInterproceduralCFG icfg, CoverageReport coverageReport) {
         Set<SootMethod> methods = getSootMethods(view, icfg);
 

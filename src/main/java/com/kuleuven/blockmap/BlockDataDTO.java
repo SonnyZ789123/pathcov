@@ -2,17 +2,17 @@ package com.kuleuven.blockmap;
 
 import java.util.List;
 
-public class BlockData {
+public class BlockDataDTO {
     private final int id;
     private final String sourceHash;
-    private final BlockCoverageData coverageData;
+    private final BlockCoverageDataDTO coverageData;
     private final List<Integer> parentBlockId;
     private final List<Integer> successorBlockIds;
 
-    public BlockData(
+    public BlockDataDTO(
             int id,
             String sourceHash,
-            BlockCoverageData coverageData,
+            BlockCoverageDataDTO coverageData,
             List<Integer> predecessorBlockIds,
             List<Integer> successorBlockIds) {
         this.id = id;

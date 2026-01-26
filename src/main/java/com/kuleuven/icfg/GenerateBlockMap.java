@@ -3,7 +3,7 @@ package com.kuleuven.icfg;
 import com.github.javaparser.quality.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kuleuven.blockmap.BlockMap;
+import com.kuleuven.blockmap.BlockMapDTO;
 import com.kuleuven.blockmap.BlockMapGenerator;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.intellij.shared.CoverageDataReader;
@@ -42,7 +42,7 @@ public class GenerateBlockMap {
             Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
-            BlockMap blockMap = BlockMapGenerator.generateBlockMap(
+            BlockMapDTO blockMap = BlockMapGenerator.generateBlockMap(
                     generator.getView(), icfg, reader.getCoverageReport());
 
             writeOutputs(blockMap, outputPath);
@@ -52,7 +52,7 @@ public class GenerateBlockMap {
         }
     }
 
-    private static void writeOutputs(BlockMap blockMap, @Nullable String outputPath) throws IOException {
+    private static void writeOutputs(BlockMapDTO blockMap, @Nullable String outputPath) throws IOException {
         String writeOutputPath = outputPath != null
                 ? outputPath
                 : AppConfig.get("icfg.block_map.write.path");
