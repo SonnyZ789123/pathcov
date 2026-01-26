@@ -1,65 +1,72 @@
 package com.kuleuven.icfg;
 
-import com.kuleuven.cg.ReducedCallGraph;
-import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
-import org.jspecify.annotations.Nullable;
+import com.github.javaparser.quality.Nullable;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.kuleuven.blockmap.BlockMap;
+import com.kuleuven.blockmap.BlockMapGenerator;
+import com.kuleuven.config.AppConfig;
+import com.kuleuven.coverage.intellij.shared.CoverageDataReader;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
-import sootup.callgraph.CallGraph;
-import sootup.core.model.SootMethod;
-import sootup.core.signatures.MethodSignature;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 public class GenerateBlockMap {
     public static void main(String[] args) {
         /*
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
-         *   1: entryMethod            (e.g., "<com.kuleuven._examples.Foo: int foo(int)>")
-         *   2: outputPath             (e.g., "./output/block_map.json")
-         *   3: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
+         *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
+         *   2: coverageDataPath       (e.g., "out/coverage_data.json")
+         *   3: outputPath             (e.g., "/data/blockmap.json")
+         *   4: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
          */
-        if (args.length < 2) {
-            System.out.println("Expects args <classPath> <entryMethod> [outputPath] [projectPrefixes]");
+        if (args.length < 3) {
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <coverageDataPath> [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
         String classPath = args[0];
-        String entryFQMethodSignature = args[1];
-        String outputPath = args.length >= 3 ? args[2] : null;
-        List<String> projectPrefixes = args.length >= 4
-                ? List.of(args[3].split(","))
+        String fullyQualifiedMethodSignature = args[1];
+        String coverageDataPath = args[2];
+        String outputPath = args.length >= 4 ? args[3] : null;
+        List<String> projectPrefixes = args.length >= 5
+                ? List.of(args[4].split(","))
                 : null;
 
-        BlockInfoByIdMap blockMap = createICfgBlockMap(classPath, entryFQMethodSignature, projectPrefixes);
-
         try {
-            blockMap.dump(outputPath);
+            CoverageDataReader reader = new CoverageDataReader(coverageDataPath);
+            Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
+            JimpleBasedInterproceduralCFG icfg = generator.getICfg();
+
+            BlockMap blockMap = BlockMapGenerator.generateBlockMap(
+                    generator.getView(), icfg, reader.getCoverageReport());
+
+            writeOutputs(blockMap, outputPath);
         } catch (IOException e) {
-            System.err.println("❌ Failed to write ICFG block map: " + e.getMessage());
+            System.err.println("❌ Error while generating block map: " + e.getMessage());
             System.exit(1);
         }
     }
 
-    private static BlockInfoByIdMap createICfgBlockMap(String classPath, String entryFQMethodSignature, @Nullable List<String> projectPrefixes) {
-        Generator generator = new Generator(classPath, entryFQMethodSignature, projectPrefixes);
+    private static void writeOutputs(BlockMap blockMap, @Nullable String outputPath) throws IOException {
+        String writeOutputPath = outputPath != null
+                ? outputPath
+                : AppConfig.get("icfg.block_map.write.path");
 
-        JimpleBasedInterproceduralCFG icfg = generator.getICfg();
-        CallGraph callGraph = icfg.getCg();
+        Path output = Path.of(writeOutputPath);
+        Files.createDirectories(output.getParent());
 
-        ReducedCallGraph reducedCallGraph = new ReducedCallGraph(callGraph, projectPrefixes);
-        Set<MethodSignature> methodSignatures = reducedCallGraph.getMethodSignatures();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
 
-        List<SootMethod> methods = methodSignatures.stream()
-                .map(sig -> generator.getView().getMethod(sig))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        return new BlockInfoByIdMap(methods);
+        try (FileWriter writer = new FileWriter(output.toFile())) {
+            gson.toJson(blockMap, writer);
+            System.out.println("✅ Block map JSON written to " + output);
+        }
     }
 }
