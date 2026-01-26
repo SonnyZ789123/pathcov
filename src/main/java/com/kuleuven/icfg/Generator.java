@@ -5,6 +5,7 @@ import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
+import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -20,11 +21,8 @@ public class Generator {
     private final JavaView view;
     private final JavaSootMethod method;
     private final JimpleBasedInterproceduralCFG icfg;
-    @Nullable private final List<String> projectPrefixes;
 
     public Generator(String classPath, String fullyQualifiedMethodSignature, @Nullable List<String> projectPrefixes) {
-        this.projectPrefixes = projectPrefixes;
-
         // Load classes from the given classpath
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         this.view = new JavaView(inputLocation);
@@ -45,9 +43,13 @@ public class Generator {
 
         this.method = opt.get();
 
-        this.icfg = new JimpleBasedInterproceduralCFG(
-                view,
-                Collections.singletonList(method.getSignature()),
+        CallGraph cg = (new ClassHierarchyAnalysisAlgorithm(view))
+                .initialize(Collections.singletonList(method.getSignature()));
+
+        // Reduce the call graph to project-specific classes if prefixes are provided
+        ReducedCallGraph reducedCallGraph = new ReducedCallGraph(cg, projectPrefixes);
+
+        this.icfg = new JimpleBasedInterproceduralCFG(reducedCallGraph, view,
                 false, false);
     }
 
@@ -64,10 +66,7 @@ public class Generator {
     }
 
     public String dotExport() {
-        CallGraph callGraph = getICfg().getCg();
-        ReducedCallGraph reducedCallGraph = new ReducedCallGraph(callGraph, projectPrefixes);
-
-        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg(), reducedCallGraph);
+        BuildICFGGraph builder = new BuildICFGGraph(view, getICfg());
 
         return builder.buildICFGGraph(false);
     }
