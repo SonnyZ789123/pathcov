@@ -1,10 +1,10 @@
 package com.kuleuven.icfg.coverage;
 
 import com.github.javaparser.quality.Nullable;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.kuleuven.blockmap.BlockMapDTO;
 import com.kuleuven.config.AppConfig;
-import com.kuleuven.coverage.intellij.shared.CoverageDataReader;
-import com.kuleuven.icfg.CoverageAgent.shared.BlockInfoByIdMap;
-import com.kuleuven.coverage.CoverageAgent.shared.BlockInfo;
 import com.kuleuven.icfg.Generator;
 import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
@@ -20,44 +20,42 @@ public class GenerateCoverageGraph {
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
          *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
-         *   2: coverageDataPath       (e.g., "out/coverage.json")
-         *   3: blockMapPath           (e.g., "./output/block_map.json")
-         *   4: outputPath             (e.g., "/data/coverage_graph.dot")
-         *   5: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
+         *   2: blockMapPath           (e.g., "./out/icfg_block_map.json")
+         *   3: outputPath             (e.g., "/data/coverage_graph.dot")
+         *   4: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
          */
         if (args.length < 3) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <coverageDataPath> [blockMapPath] [outputPath] [projectPrefixes]");
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <blockMapPath> [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
-        String coverageDataPath = args[2];
-        String blockMapPath = args.length >= 4 ? args[3] : null;
-        String outputPath = args.length >= 5 ? args[4] : null;
-        List<String> projectPrefixes = args.length >= 6
-                ? List.of(args[5].split(","))
+        String blockMapPath = args[2];
+        String outputPath = args.length >= 4 ? args[3] : null;
+        List<String> projectPrefixes = args.length >= 5
+                ? List.of(args[4].split(","))
                 : null;
 
-        Map<Integer, BlockInfo> blockMap = null;
-        try {
-            blockMap = BlockInfoByIdMap.readFromJson(blockMapPath);
+        BlockMapDTO blockMap = null;
+        try (FileReader reader = new FileReader(Path.of(blockMapPath).toFile())) {
+            Gson gson = new GsonBuilder().create();
+             blockMap = gson.fromJson(reader, BlockMapDTO.class);
         } catch (IOException e) {
-            System.err.println("❌ Failed to load block map: " + e.getMessage());
+            System.err.println("❌ Failed to read block map from path " + blockMapPath);
             System.exit(1);
         }
 
         try {
-            CoverageDataReader reader = new CoverageDataReader(coverageDataPath);
             Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
-            BuildICFGGraph builder = new BuildICFGGraph(generator.getView(), icfg, reader.getCoverageReport());
+            BuildICFGGraph builder = new BuildICFGGraph(generator.getView(), icfg, new BlockCoverageMap(blockMap));
             String icfgAsDot = builder.buildICFGGraph(true);
 
             writeOutputs(icfgAsDot, outputPath);
         } catch (IOException e) {
-            System.err.println("❌ Failed to read block coverage map from path " + coverageDataPath);
+            System.err.println("❌ Failed to write coverage graph: " + e.getMessage());
             System.exit(1);
         }
     }

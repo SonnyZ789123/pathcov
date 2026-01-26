@@ -25,9 +25,9 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kuleuven.coverage.CoverageReport;
+import com.kuleuven.blockmap.MethodBlockMapDTO;
 import com.kuleuven.coverage.model.LineDTO;
-import com.kuleuven.coverage.model.MethodDTO;
+import com.kuleuven.icfg.coverage.BlockCoverageMap;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
 import org.jspecify.annotations.Nullable;
@@ -56,7 +56,7 @@ public class ICFGDotExporter {
             View view,
             CallGraph callGraph,
             boolean compact,
-            @Nullable CoverageReport coverageReport) {
+            @Nullable BlockCoverageMap blockCoverageMap) {
         final StringBuilder sb = new StringBuilder();
         DotExporter.buildDiGraphObject(sb);
         Map<Integer, MethodSignature> calls;
@@ -67,9 +67,9 @@ public class ICFGDotExporter {
             String jvmFullName = SootMethodEncoder.toJvmMethodFullName(entry.getKey().toString());
 
             List<LineDTO> methodLineCoverage = null;
-            if (coverageReport != null) {
-                MethodDTO methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
-                methodLineCoverage = methodCoverage != null ? methodCoverage.lines : Collections.emptyList();
+            if (blockCoverageMap != null) {
+                MethodBlockMapDTO methodCoverage = blockCoverageMap.getForMethodFullName(jvmFullName);
+                methodLineCoverage = methodCoverage != null ? methodCoverage.getLineCoverage() : Collections.emptyList();
             }
 
             String graph = DotExporter.buildGraph(
@@ -78,6 +78,7 @@ public class ICFGDotExporter {
                     entry.getKey(),
                     methodSignatures,
                     compact,
+                    // TODO: find a way to map JSON block data to the block in the CFG so I can use the block coverage data
                     methodLineCoverage);
             sb.append(graph).append("\n");
         }

@@ -24,7 +24,7 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 
 import java.util.*;
 
-import com.kuleuven.coverage.CoverageReport;
+import com.kuleuven.icfg.coverage.BlockCoverageMap;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
 import sootup.core.graph.ControlFlowGraph;
@@ -40,28 +40,28 @@ public class BuildICFGGraph {
 
     private final View view;
     private final JimpleBasedInterproceduralCFG icfg;
-    private final CoverageReport coverageReport;
+    private final BlockCoverageMap blockCoverageMap;
 
     public BuildICFGGraph(View view, JimpleBasedInterproceduralCFG icfg) {
         this.view = view;
         this.icfg = icfg;
-        this.coverageReport = null;
+        this.blockCoverageMap = null;
     }
 
     public BuildICFGGraph(
             View view,
             JimpleBasedInterproceduralCFG icfg,
-            CoverageReport coverageReport) {
+            BlockCoverageMap blockCoverageMap) {
         this.view = view;
         this.icfg = icfg;
-        this.coverageReport = coverageReport;
+        this.blockCoverageMap = blockCoverageMap;
     }
 
     public String buildICFGGraph(boolean compact) {
         Map<MethodSignature, ControlFlowGraph<?>> signatureToControlFlowGraph = new LinkedHashMap<>();
         CallGraph cg = icfg.getCg();
         computeAllCalls(cg.getEntryMethods(), signatureToControlFlowGraph, cg);
-        return ICFGDotExporter.buildICFGGraph(signatureToControlFlowGraph, view, cg, compact, coverageReport);
+        return ICFGDotExporter.buildICFGGraph(signatureToControlFlowGraph, view, cg, compact, blockCoverageMap);
     }
 
     public void computeAllCalls(
