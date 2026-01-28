@@ -1,5 +1,6 @@
 package com.kuleuven.blockmap;
 
+import com.kuleuven.blockmap.hash.BlockHashBuilder;
 import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.model.LineDTO;
 import com.kuleuven.coverage.model.MethodDTO;
@@ -60,8 +61,10 @@ public class BlockMapBuilder {
         for (BasicBlock<?> block : cfg.getBlocks()) {
             int blockId = blockToIdMap.get(block);
             assert blockId != -1;
-            // TODO: Compute actual source hash based on the actual source.
-            String sourceHash = String.valueOf(block.hashCode());
+
+            BlockHashBuilder blockHashBuilder = new BlockHashBuilder(block);
+            String sourceHash = blockHashBuilder.build();
+
             BlockCoverageDataDTO blockCoverageData = methodCoverage != null ?
                     new BlockCoverageDataDTO(getLineCoverageList(block, methodCoverage)) :
                     BlockCoverageDataDTO.createEmpty();
