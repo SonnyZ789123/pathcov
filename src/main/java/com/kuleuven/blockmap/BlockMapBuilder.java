@@ -5,7 +5,6 @@ import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.model.LineDTO;
 import com.kuleuven.coverage.model.MethodDTO;
 import com.kuleuven.jvm.descriptor.SootMethodEncoder;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import sootup.core.graph.BasicBlock;
 import sootup.core.graph.ControlFlowGraph;
@@ -19,10 +18,12 @@ public class BlockMapBuilder {
     private final Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap;
     private final CoverageReport coverageReport;
     private final Map<BasicBlock<?>, Integer> blockToIdMap = new HashMap<>();
+    private final Map<Integer, LineDTO> lineToCoverageMap;
 
     public BlockMapBuilder(Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap, CoverageReport coverageReport) {
         this.methodToCfgMap = methodToCfgMap;
         this.coverageReport = coverageReport;
+        this.lineToCoverageMap = coverageReport.getLineToCoverageMap();
     }
 
     public BlockMapDTO build() {
@@ -65,9 +66,18 @@ public class BlockMapBuilder {
             BlockHashBuilder blockHashBuilder = new BlockHashBuilder(block);
             String sourceHash = blockHashBuilder.build();
 
-            BlockCoverageDataDTO blockCoverageData = methodCoverage != null ?
-                    new BlockCoverageDataDTO(getLineCoverageList(block, methodCoverage)) :
-                    BlockCoverageDataDTO.createEmpty();
+            BlockCoverageDataDTO blockCoverageData;
+
+            if (methodCoverage != null) {
+                List<LineDTO> lineCoverageList = getLineCoverageList(block);
+
+                // No line coverage for a block is considered as uncovered.
+                // Could be a fully synthetic block without any source mapping?
+                blockCoverageData = lineCoverageList.isEmpty() ?
+                        BlockCoverageDataDTO.createNoCoverageData() : new BlockCoverageDataDTO(lineCoverageList);
+            } else {
+                blockCoverageData = BlockCoverageDataDTO.createNoCoverageData();
+            }
 
             List<? extends BasicBlock<?>> parentBlocks = block.getPredecessors();
             List<? extends BasicBlock<?>> successorBlocks = block.getSuccessors();
@@ -89,62 +99,21 @@ public class BlockMapBuilder {
         return blockDataList;
     }
 
-    private List<LineDTO> getLineCoverageList(BasicBlock<?> block, @NonNull MethodDTO methodCoverage) {
-        List<LineDTO> lineCoverageList = new ArrayList<>();
-
-        // Line with the lowest line number gets polled first
-        Queue<LineDTO> methodCoverageLines = new PriorityQueue<>(Comparator.comparingInt(a -> a.line));
-        methodCoverageLines.addAll(methodCoverage.lines);
-
-        Queue<Stmt> stmts = new PriorityQueue<>(
-                Comparator.comparingInt(stmt ->
-                        stmt.getPositionInfo().getStmtPosition().getFirstLine()
-                )
-        );
-
-        block.getStmts().stream()
+    private List<LineDTO> getLineCoverageList(BasicBlock<?> block) {
+        List<Stmt> stmts = block.getStmts().stream()
                 // Filter out synthetic statements without position info (e.g., @caughtexception)
                 .filter(stmt -> stmt.getPositionInfo() != null)
-                .filter(stmt -> stmt.getPositionInfo().getStmtPosition() != null)
                 .filter(stmt -> stmt.getPositionInfo().getStmtPosition().getFirstLine() > 0)
-                .forEach(stmts::add);
+                .toList();
 
         if (stmts.isEmpty()) {
-            return lineCoverageList;
+            return Collections.emptyList();
         }
 
-        Stmt firstStmt = stmts.peek();
-        assert firstStmt != null; // no empty blocks
-
-        int firstStmtLine = firstStmt.getPositionInfo().getStmtPosition().getFirstLine();
-
-        // Remove all lines that are before the first statement in the block
-        while (!methodCoverageLines.isEmpty() && methodCoverageLines.peek().line < firstStmtLine) {
-            methodCoverageLines.remove();
-        }
-
-        while (!stmts.isEmpty() && !methodCoverageLines.isEmpty()) {
-            Stmt stmt = stmts.remove();
-
-            int firstLine = stmt.getPositionInfo().getStmtPosition().getFirstLine();
-            int lastLine = stmt.getPositionInfo().getStmtPosition().getLastLine();
-
-            LineDTO lineCoverage = methodCoverageLines.peek();
-            assert lineCoverage != null;
-            // TODO: we could also just add any lines that fall within the block's head's first line, and tail's last line
-            // but that does not check that every line is in a corresponding statement.
-            if (lineCoverage.line < firstLine) {
-                throw new IllegalStateException("❌ Coverage line " + lineCoverage.line +
-                        " does not match any statement in the block");
-            }
-
-            // Add all lines that fall within the statement's line range
-            while (!methodCoverageLines.isEmpty() && methodCoverageLines.peek().line <= lastLine) {
-                LineDTO matched = methodCoverageLines.remove();
-                lineCoverageList.add(matched);
-            }
-        }
-
-        return lineCoverageList;
+        return stmts.stream()
+                .map(stmt -> lineToCoverageMap.get(stmt.getPositionInfo().getStmtPosition().getFirstLine()))
+                // You can still have statements without line coverage info (e.g., stmts that correspond to a catch(...) line)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }
