@@ -33,7 +33,7 @@ public class BlockCoverageDataDTO {
         return coverageState;
     }
 
-    public static BlockCoverageDataDTO createEmpty() {
+    public static BlockCoverageDataDTO createNoCoverageData() {
         return new BlockCoverageDataDTO(Collections.emptyList(), CoverageState.NOT_COVERED);
     }
 
