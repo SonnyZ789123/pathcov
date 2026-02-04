@@ -3,7 +3,7 @@ package com.kuleuven.icfg;
 import com.github.javaparser.quality.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kuleuven.blockmap.BlockMapDTO;
+import com.kuleuven.blockmap.model.BlockMapDTO;
 import com.kuleuven.blockmap.BlockMapGenerator;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.coverage.intellij.shared.CoverageDataReader;

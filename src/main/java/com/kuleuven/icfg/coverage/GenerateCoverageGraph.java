@@ -3,7 +3,7 @@ package com.kuleuven.icfg.coverage;
 import com.github.javaparser.quality.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kuleuven.blockmap.BlockMapDTO;
+import com.kuleuven.blockmap.model.BlockMapDTO;
 import com.kuleuven.config.AppConfig;
 import com.kuleuven.icfg.Generator;
 import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
@@ -40,7 +40,7 @@ public class GenerateCoverageGraph {
         BlockMapDTO blockMap = null;
         try (FileReader reader = new FileReader(Path.of(blockMapPath).toFile())) {
             Gson gson = new GsonBuilder().create();
-             blockMap = gson.fromJson(reader, BlockMapDTO.class);
+            blockMap = gson.fromJson(reader, BlockMapDTO.class);
         } catch (IOException e) {
             System.err.println("❌ Failed to read block map from path " + blockMapPath);
             System.exit(1);

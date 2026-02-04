@@ -1,6 +1,10 @@
 package com.kuleuven.blockmap;
 
 import com.kuleuven.blockmap.hash.BlockHashBuilder;
+import com.kuleuven.blockmap.model.BlockCoverageDataDTO;
+import com.kuleuven.blockmap.model.BlockDataDTO;
+import com.kuleuven.blockmap.model.BlockMapDTO;
+import com.kuleuven.blockmap.model.MethodBlockMapDTO;
 import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.model.LineDTO;
 import com.kuleuven.coverage.model.MethodDTO;
@@ -74,9 +78,10 @@ public class BlockMapBuilder {
                 // No line coverage for a block is considered as uncovered.
                 // Could be a fully synthetic block without any source mapping?
                 blockCoverageData = lineCoverageList.isEmpty() ?
-                        BlockCoverageDataDTO.createNoCoverageData() : new BlockCoverageDataDTO(lineCoverageList);
+                        BlockCoverageData.createNoCoverageData() :
+                        BlockCoverageData.createBlockCoverageDataDTO(lineCoverageList);
             } else {
-                blockCoverageData = BlockCoverageDataDTO.createNoCoverageData();
+                blockCoverageData = BlockCoverageData.createNoCoverageData();
             }
 
             List<? extends BasicBlock<?>> parentBlocks = block.getPredecessors();
