@@ -1,7 +1,7 @@
 package com.kuleuven.icfg.coverage;
 
-import com.kuleuven.blockmap.BlockMapDTO;
-import com.kuleuven.blockmap.MethodBlockMapDTO;
+import com.kuleuven.blockmap.model.BlockMapDTO;
+import com.kuleuven.blockmap.model.MethodBlockMapDTO;
 import org.jspecify.annotations.Nullable;
 
 public class BlockCoverageMap {
@@ -13,8 +13,8 @@ public class BlockCoverageMap {
     }
 
     public @Nullable MethodBlockMapDTO getForMethodFullName(String methodFullName) {
-        return blockMap.getMethodBlockMaps().stream()
-                .filter(m -> m.getFullName().equals(methodFullName))
+        return blockMap.methodBlockMaps.stream()
+                .filter(m -> m.fullName.equals(methodFullName))
                 .findFirst().orElse(null);
     }
 }

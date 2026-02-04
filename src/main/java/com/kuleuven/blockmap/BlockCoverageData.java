@@ -1,43 +1,23 @@
 package com.kuleuven.blockmap;
 
+import com.kuleuven.blockmap.model.BlockCoverageDataDTO;
+import com.kuleuven.blockmap.model.BlockCoverageDataDTO.CoverageState;
 import com.kuleuven.coverage.model.LineDTO;
 
 import java.util.Collections;
 import java.util.List;
 
-public class BlockCoverageDataDTO {
-    public enum CoverageState {
-        COVERED,
-        NOT_COVERED,
-        PARTIALLY_COVERED
-    }
+public class BlockCoverageData {
 
-    private final List<LineDTO> lines;
-    private final CoverageState coverageState;
-
-    public BlockCoverageDataDTO(List<LineDTO> lines) {
-        this.lines = lines;
-        this.coverageState = determineCoverageState(lines);
-    }
-
-    private BlockCoverageDataDTO(List<LineDTO> lines, CoverageState coverageState) {
-        this.lines = lines;
-        this.coverageState = coverageState;
-    }
-
-    public List<LineDTO> getLines() {
-        return lines;
-    }
-
-    public CoverageState getCoverageState() {
-        return coverageState;
+    public static BlockCoverageDataDTO createBlockCoverageDataDTO(List<LineDTO> lines) {
+        return new BlockCoverageDataDTO(lines, determineCoverageState(lines));
     }
 
     public static BlockCoverageDataDTO createNoCoverageData() {
         return new BlockCoverageDataDTO(Collections.emptyList(), CoverageState.NOT_COVERED);
     }
 
-    private CoverageState determineCoverageState(List<LineDTO> lineCoverageList) {
+    private static CoverageState determineCoverageState(List<LineDTO> lineCoverageList) {
         boolean partiallyCovered = false;
 
         for (LineDTO lineCoverage : lineCoverageList) {

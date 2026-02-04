@@ -25,7 +25,8 @@ package com.kuleuven.icfg.sootup.analysis.interprocedural.icfg;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.kuleuven.blockmap.MethodBlockMapDTO;
+import com.kuleuven.blockmap.MethodBlockMap;
+import com.kuleuven.blockmap.model.MethodBlockMapDTO;
 import com.kuleuven.coverage.model.LineDTO;
 import com.kuleuven.icfg.coverage.BlockCoverageMap;
 import com.kuleuven.icfg.sootup.core.util.DotExporter;
@@ -69,7 +70,7 @@ public class ICFGDotExporter {
             List<LineDTO> methodLineCoverage = null;
             if (blockCoverageMap != null) {
                 MethodBlockMapDTO methodCoverage = blockCoverageMap.getForMethodFullName(jvmFullName);
-                methodLineCoverage = methodCoverage != null ? methodCoverage.getLineCoverage() : Collections.emptyList();
+                methodLineCoverage = methodCoverage != null ? MethodBlockMap.getLineCoverage(methodCoverage) : Collections.emptyList();
             }
 
             String graph = DotExporter.buildGraph(

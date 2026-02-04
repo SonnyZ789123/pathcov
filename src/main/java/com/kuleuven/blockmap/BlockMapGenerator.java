@@ -1,5 +1,6 @@
 package com.kuleuven.blockmap;
 
+import com.kuleuven.blockmap.model.BlockMapDTO;
 import com.kuleuven.coverage.CoverageReport;
 import org.jspecify.annotations.NonNull;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
