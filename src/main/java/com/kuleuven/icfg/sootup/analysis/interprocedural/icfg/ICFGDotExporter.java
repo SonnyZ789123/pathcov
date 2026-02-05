@@ -67,10 +67,10 @@ public class ICFGDotExporter {
         for (Map.Entry<MethodSignature, ControlFlowGraph<?>> entry : signatureToControlFlowGraph.entrySet()) {
             String jvmFullName = SootMethodEncoder.toJvmMethodFullName(entry.getKey().toString());
 
-            List<LineDTO> methodLineCoverage = null;
+            MethodBlockMap methodBlockMap = null;
             if (blockCoverageMap != null) {
                 MethodBlockMapDTO methodCoverage = blockCoverageMap.getForMethodFullName(jvmFullName);
-                methodLineCoverage = methodCoverage != null ? MethodBlockMap.getLineCoverage(methodCoverage) : Collections.emptyList();
+                methodBlockMap = methodCoverage != null ? new MethodBlockMap(methodCoverage) : null;
             }
 
             String graph = DotExporter.buildGraph(
@@ -79,8 +79,7 @@ public class ICFGDotExporter {
                     entry.getKey(),
                     methodSignatures,
                     compact,
-                    // TODO: find a way to map JSON block data to the block in the CFG so I can use the block coverage data
-                    methodLineCoverage);
+                    methodBlockMap);
             sb.append(graph).append("\n");
         }
         sb.append("}");

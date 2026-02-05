@@ -26,6 +26,9 @@ import com.google.common.collect.Sets;
 
 import java.util.*;
 
+import com.kuleuven.blockmap.MethodBlockMap;
+import com.kuleuven.blockmap.hash.BlockHashBuilder;
+import com.kuleuven.blockmap.model.BlockDataDTO;
 import com.kuleuven.coverage.model.LineDTO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
@@ -49,7 +52,8 @@ public class DotExporter {
     private enum CoverageType {
         FULL,
         PARTIAL,
-        NONE
+        NONE,
+        MISSING
     }
 
     public static String buildGraph(
@@ -58,7 +62,7 @@ public class DotExporter {
             MethodSignature methodSignature,
             Set<MethodSignature> methodSignatures,
             boolean compact,
-            @Nullable List<LineDTO> methodLineCoverage) {
+            @Nullable MethodBlockMap methodBlockMap) {
 
         // TODO: hint: use edge weight to have a better top->down code like linear layouting with
         // starting stmt at the top;
@@ -85,16 +89,20 @@ public class DotExporter {
         Set<BasicBlock<?>> drawnBlocks = Sets.newHashSetWithExpectedSize(blocks.size());
 
         for (BasicBlock<?> block : blocks) {
+            BlockHashBuilder blockHashBuilder = new BlockHashBuilder(block);
+            String blockHash = blockHashBuilder.build();
+
             StringBuilder coverageLabelSb = new StringBuilder();
             StringBuilder coverageStyleSb = new StringBuilder();
-            if (methodLineCoverage != null) {
-                CoverageType blockCoverageType = getBlockCoverageType(block, methodLineCoverage);
+            if (methodBlockMap != null) {
+                BlockDataDTO blockData = methodBlockMap.getBlockDataByHash(blockHash);
+                CoverageType blockCoverageType = getBlockCoverageType(blockData);
                 coverageLabelSb
-                        .append("\t\tlabel = \"").append(getBlockLabel(blockCoverageType)).append("\"\n");
+                        .append("\t\tlabel = \"").append(getBlockLabel(blockData)).append("\"\n");
                 coverageStyleSb
                         .append("\t\tstyle = filled\n")
                         .append("\t\tcolor = ").append(getBlockColor(blockCoverageType)).append("\n")
-                        .append("\t\tfontsize = 12\n");
+                        .append("\t\tfontsize = 10\n");
             }
 
             sb.append("//  lines [")
@@ -253,39 +261,56 @@ public class DotExporter {
         return sb;
     }
 
-    private static CoverageType getBlockCoverageType(BasicBlock<?> block, List<LineDTO> methodLineCoverage) {
-        // TODO: Can we assume that the first line of the first statement represents the block's whole coverage?
-        int lineNumber = block.getHead().getPositionInfo().getStmtPosition().getFirstLine();
+    private static CoverageType getBlockCoverageType(@Nullable BlockDataDTO blockData) {
+        if (blockData == null || blockData.coverageData == null) {
+            return CoverageType.MISSING;
+        }
 
-        for (LineDTO lineCoverage : methodLineCoverage) {
-            if (lineCoverage.line == lineNumber) {
-                return getCoverageType(lineCoverage);
+        return switch (blockData.coverageData.coverageState) {
+            case COVERED -> CoverageType.FULL;
+            case NOT_COVERED -> CoverageType.NONE;
+            case PARTIALLY_COVERED -> CoverageType.PARTIAL;
+        };
+    }
+
+    private static String getBlockLabel(@Nullable BlockDataDTO blockData) {
+        if (blockData == null || blockData.coverageData == null) {
+            return "no coverage data";
+        }
+
+        int blockId = blockData.id;
+        int sumHits = blockData.coverageData.lines.stream()
+                .mapToInt(line -> line.hits)
+                .sum();
+        // hits should be the same for all lines in a block
+        int avgHits = sumHits / blockData.coverageData.lines.size();
+        String branchesLabel = getBranchesLabel(blockData.coverageData.lines);
+
+        return String.format("Block ID: %d\\nHits: %d\\n%s",
+                blockId,
+                avgHits,
+                branchesLabel);
+    }
+
+    private static String getBranchesLabel(List<LineDTO> lines) {
+        LineDTO branchesLine = getFirstBranchesLine(lines);
+        if (branchesLine == null) {
+            return "";
+        }
+
+        int coveredBranches = branchesLine.branches.covered;
+        int totalBranches = branchesLine.branches.total;
+
+        return String.format("Branches: %d/%d", coveredBranches, totalBranches);
+    }
+
+    private static LineDTO getFirstBranchesLine(List<LineDTO> lines) {
+        for (LineDTO line : lines) {
+            if (line.branches.total > 0) {
+                return line;
             }
         }
-        return CoverageType.NONE;
-    }
-
-    private static CoverageType getCoverageType(LineDTO line) {
-        // uncovered
-        if (line.hits == 0) {
-            return CoverageType.NONE;
-        }
-
-        // partially covered
-        if (line.branches.covered != line.branches.total) {
-            return CoverageType.PARTIAL;
-        }
-
-        // fully covered
-        return CoverageType.FULL;
-    }
-
-    private static String getBlockLabel(CoverageType coverageType) {
-        return switch (coverageType) {
-            case NONE -> "uncovered";
-            case PARTIAL -> "partially covered";
-            case FULL -> "fully covered";
-        };
+        return null;
     }
 
     private static String getBlockColor(CoverageType coverageType) {
@@ -293,6 +318,7 @@ public class DotExporter {
             case NONE -> "lightcoral";
             case PARTIAL -> "khaki1";
             case FULL -> "palegreen3";
+            case MISSING -> "lightgrey";
         };
     }
 }
