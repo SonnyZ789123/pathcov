@@ -282,6 +282,11 @@ public class DotExporter {
         int sumHits = blockData.coverageData.lines.stream()
                 .mapToInt(line -> line.hits)
                 .sum();
+
+        if (blockData.coverageData.lines.isEmpty()) {
+            return String.format("Block ID: %d\\nno line coverage data", blockId);
+        }
+
         // hits should be the same for all lines in a block
         int avgHits = sumHits / blockData.coverageData.lines.size();
         String branchesLabel = getBranchesLabel(blockData.coverageData.lines);
