@@ -21,6 +21,11 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.1</version>
 
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <skip>${skipShade}</skip>
+                </configuration>
+
                 <executions>
                     <execution>
                         <phase>package</phase>
