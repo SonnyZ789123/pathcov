@@ -1,8 +1,6 @@
 package com.kuleuven.cg;
 
-import com.kuleuven.icfg.sootup.analysis.interprocedural.icfg.BuildICFGGraph;
 import org.jspecify.annotations.Nullable;
-import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.core.inputlocation.AnalysisInputLocation;
