@@ -37,7 +37,10 @@ public class BlockMapGenerator {
         methodSignatures.forEach(methodSignature -> {
             Optional<JavaSootMethod> opt = view.getMethod(methodSignature);
             if (opt.isEmpty()) {
-                throw new IllegalStateException("❌ Method not found: " + methodSignature);
+                // Could be a method from a superclass, so the method signature is not correct.
+                // TODO: In the reduced call graph, we should also filter the inferred methods from java and
+                // blacklisted  classes to avoid this problem.
+                return;
             }
 
             SootMethod method = opt.get();
