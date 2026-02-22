@@ -140,7 +140,7 @@
         <dependency>
             <groupId>com.kuleuven</groupId>
             <artifactId>intellij-coverage-model</artifactId>
-            <version>2.1.0</version>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
