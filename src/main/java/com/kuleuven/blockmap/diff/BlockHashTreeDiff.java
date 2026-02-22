@@ -59,7 +59,8 @@ public class BlockHashTreeDiff {
             for (BlockDataDTO candidate : candidates) {
                 if (matchedCurrent.contains(candidate)) continue;
 
-                if (structurallyEqual(prevBlock, candidate)) {
+                // If you also want to check the parent/successor hashes, use structurallyEqual instead
+                if (prevBlock.blockHash.equals(candidate.blockHash)) {
                     matched = candidate;
                     break;
                 }
