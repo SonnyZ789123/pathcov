@@ -20,7 +20,7 @@ public class MethodBlockMap {
         this.hashToBlockDataMap = new HashMap<>();
 
         for (BlockDataDTO block : methodBlockMap.blocks) {
-            hashToBlockDataMap.put(block.sourceHash, block);
+            hashToBlockDataMap.put(block.blockHash, block);
         }
     }
 

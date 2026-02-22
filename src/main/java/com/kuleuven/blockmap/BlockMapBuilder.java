@@ -68,7 +68,7 @@ public class BlockMapBuilder {
             assert blockId != -1;
 
             BlockHashBuilder blockHashBuilder = new BlockHashBuilder(block);
-            String sourceHash = blockHashBuilder.build();
+            String blockHash = blockHashBuilder.build();
 
             BlockCoverageDataDTO blockCoverageData;
 
@@ -94,7 +94,7 @@ public class BlockMapBuilder {
 
             BlockDataDTO blockData = new BlockDataDTO(
                     blockId,
-                    sourceHash,
+                    blockHash,
                     blockCoverageData,
                     parentBlockIds,
                     successorBlockIds);
