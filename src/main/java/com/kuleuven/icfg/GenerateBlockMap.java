@@ -33,7 +33,7 @@ public class GenerateBlockMap {
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
         String coverageDataPath = args.length >= 3 && !Objects.equals(args[2], "null") ? args[2] : null;
-        String outputPath = args.length >= 4 && !Objects.equals(args[2], "null") ? args[3] : null;
+        String outputPath = args.length >= 4 && !Objects.equals(args[3], "null") ? args[3] : null;
         List<String> projectPrefixes = args.length >= 5
                 ? List.of(args[4].split(","))
                 : null;
