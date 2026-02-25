@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.kuleuven.blockmap.model.BlockMapDTO;
 import com.kuleuven.blockmap.BlockMapGenerator;
 import com.kuleuven.config.AppConfig;
+import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.intellij.shared.CoverageDataReader;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 
@@ -24,26 +25,35 @@ public class GenerateBlockMap {
          *   3: outputPath             (e.g., "/data/blockmap.json")
          *   4: projectPrefixes        (e.g., "com.kuleuven,test.SimpleExample")
          */
-        if (args.length < 3) {
-            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> <coverageDataPath> [outputPath] [projectPrefixes]");
+        if (args.length < 2) {
+            System.out.println("Expects args <classPath> <fullyQualifiedMethodSignature> [coverageDataPath] [outputPath] [projectPrefixes]");
             System.exit(1);
         }
 
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
-        String coverageDataPath = args[2];
-        String outputPath = args.length >= 4 ? args[3] : null;
+        String coverageDataPath = args.length >= 3 && !Objects.equals(args[2], "null") ? args[2] : null;
+        String outputPath = args.length >= 4 && !Objects.equals(args[2], "null") ? args[3] : null;
         List<String> projectPrefixes = args.length >= 5
                 ? List.of(args[4].split(","))
                 : null;
 
+        CoverageReport coverageReport = null;
+        if (coverageDataPath != null) {
+            try {
+                CoverageDataReader reader = new CoverageDataReader(coverageDataPath);
+                coverageReport = reader.getCoverageReport();
+            } catch (IOException e) {
+                System.err.println("❌ Error while reading coverage data: " + e.getMessage());
+                System.exit(1);
+            }
+        }
+
         try {
-            CoverageDataReader reader = new CoverageDataReader(coverageDataPath);
             Generator generator = new Generator(classPath, fullyQualifiedMethodSignature, projectPrefixes);
             JimpleBasedInterproceduralCFG icfg = generator.getICfg();
 
-            BlockMapDTO blockMap = BlockMapGenerator.generateBlockMap(
-                    generator.getView(), icfg, reader.getCoverageReport());
+            BlockMapDTO blockMap = BlockMapGenerator.generateBlockMap(generator.getView(), icfg, coverageReport);
 
             writeOutputs(blockMap, outputPath);
         } catch (IOException e) {

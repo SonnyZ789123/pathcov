@@ -3,6 +3,7 @@ package com.kuleuven.coverage.intellij.shared;
 import com.google.gson.Gson;
 import com.kuleuven.coverage.CoverageReport;
 import com.kuleuven.coverage.model.CoverageReportDTO;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
 public class CoverageDataReader {
     private final CoverageReport coverageReport;
 
-    public CoverageDataReader(String outputPath) throws IOException {
+    public CoverageDataReader(@NonNull String outputPath) throws IOException {
         Gson gson = new Gson();
 
         try (Reader r = Files.newBufferedReader(Path.of(outputPath))) {

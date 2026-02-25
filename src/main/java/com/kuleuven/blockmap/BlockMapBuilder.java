@@ -20,14 +20,18 @@ import java.util.*;
 public class BlockMapBuilder {
 
     private final Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap;
-    private final CoverageReport coverageReport;
+    private final @Nullable CoverageReport coverageReport;
     private final Map<BasicBlock<?>, Integer> blockToIdMap = new HashMap<>();
     private final Map<Integer, LineDTO> lineToCoverageMap;
 
-    public BlockMapBuilder(Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap, CoverageReport coverageReport) {
+    public BlockMapBuilder(Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap, @Nullable CoverageReport coverageReport) {
         this.methodToCfgMap = methodToCfgMap;
         this.coverageReport = coverageReport;
-        this.lineToCoverageMap = coverageReport.getLineToCoverageMap();
+        if (coverageReport != null) {
+            this.lineToCoverageMap = coverageReport.getLineToCoverageMap();
+        } else {
+            this.lineToCoverageMap = new HashMap<>();
+        }
     }
 
     public BlockMapDTO build() {
@@ -39,7 +43,10 @@ public class BlockMapBuilder {
             ControlFlowGraph<?> cfg = entry.getValue();
 
             String jvmFullName = SootMethodEncoder.toJvmMethodFullName(method.getSignature().toString());
-            MethodDTO methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
+            MethodDTO methodCoverage = null;
+            if (coverageReport != null) {
+                methodCoverage = coverageReport.getForMethodFullName(jvmFullName);
+            }
 
             List<BlockDataDTO> methodBlockData = buildBlockMapForMethod(cfg, methodCoverage);
             methodBlockMaps.add(new MethodBlockMapDTO(jvmFullName, methodBlockData));

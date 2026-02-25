@@ -3,6 +3,7 @@ package com.kuleuven.blockmap;
 import com.kuleuven.blockmap.model.BlockMapDTO;
 import com.kuleuven.coverage.CoverageReport;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import sootup.analysis.interprocedural.icfg.JimpleBasedInterproceduralCFG;
 import sootup.callgraph.CallGraph;
 import sootup.core.graph.ControlFlowGraph;
@@ -16,7 +17,7 @@ import java.util.*;
 public class BlockMapGenerator {
 
     public static BlockMapDTO generateBlockMap(
-            JavaView view, JimpleBasedInterproceduralCFG icfg, CoverageReport coverageReport) {
+            JavaView view, JimpleBasedInterproceduralCFG icfg, @Nullable CoverageReport coverageReport) {
         Set<SootMethod> methods = getSootMethods(view, icfg);
 
         Map<SootMethod, ControlFlowGraph<?>> methodToCfgMap = new HashMap<>();
