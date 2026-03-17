@@ -6,6 +6,7 @@ import sootup.core.graph.BasicBlock;
 import sootup.core.jimple.common.stmt.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BlockHashBuilder {
@@ -32,6 +33,24 @@ public class BlockHashBuilder {
                         .sorted()
                         .toList()
         );
+
+        // Include predecessor edge context to disambiguate structurally identical blocks
+        // at different positions in the CFG (e.g., two `if` blocks with the same condition pattern).
+        // Encodes "I am the Nth successor of a predecessor with stmt-list hash X".
+        // Uses ALL predecessor stmts (not just tail) to differentiate predecessors that
+        // have identical tail statements but different block sizes/contents.
+        // This is position-independent (no line numbers) but structurally unique.
+        List<String> predEdges = new ArrayList<>();
+        for (BasicBlock<?> pred : block.getPredecessors()) {
+            int branchIdx = pred.getSuccessors().indexOf(block);
+            List<String> predStmtHashes = new ArrayList<>();
+            for (Stmt predStmt : pred.getStmts()) {
+                predStmtHashes.add(hashStmt(predStmt));
+            }
+            predEdges.add(predStmtHashes + "@" + branchIdx);
+        }
+        Collections.sort(predEdges);
+        blockStructure.append("|PRED_EDGE=").append(predEdges);
 
         return HashUtil.sha256(blockStructure.toString());
     }
