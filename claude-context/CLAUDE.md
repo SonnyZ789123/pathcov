@@ -26,7 +26,32 @@ The project uses Maven as build tool, and for production we bake the dependencie
 
 In the `/Users/yoran.mertens/dev/master-thesis/suts` folder are programs I do testing on. When working on a feature. You can ask me to setup a dev program to test the feature. Then you can confirm your changes are working correctly by testing it on that dev program.
 
-> We moved to ICFG, away from CFG. It could be that we use some methods from the cfg package. But you should not make any updates to the cfg part of the pathcov project. 
+> We moved to ICFG, away from CFG. It could be that we use some methods from the cfg package. But you should not make any updates to the cfg part of the pathcov project.
+
+### Running the pipeline
+
+The pathcov project and its main classes can be run without a container. However, the full pipeline runs inside a Docker container because it provides the necessary environment variables and configuration. The source code, intellij-coverage-model, and the SUT are bind-mounted into the container — the mount configuration is defined in the `coverage-guided-concolic-pipeline` project.
+
+- Enter the container: `docker exec -it pathcov /bin/bash`
+- Run the full pipeline: `/scripts/run_pipeline.sh` (inside the container)
+- Compile locally: `mvn compile -DskipShade` (from this project's root)
+
+Pipeline outputs (bind-mounted, accessible from host):
+- Coverage block map: `/Users/yoran.mertens/dev/master-thesis/coverage-guided-concolic-pipeline/development/data/blockmaps/icfg_block_map.json`
+- Coverage graph (DOT): `/Users/yoran.mertens/dev/master-thesis/coverage-guided-concolic-pipeline/output/visualization/icfg/coverage/`
+- Coverage data (JSON): `/Users/yoran.mertens/dev/master-thesis/coverage-guided-concolic-pipeline/development/data/coverage/coverage_data.json`
+
+### Updating intellij-coverage-model
+
+The intellij-coverage-model is a shared dependency between pathcov and JDart. When updating it:
+1. Make changes in `/Users/yoran.mertens/dev/master-thesis/intellij-coverage-model`
+2. `mvn install` to install to local Maven repo
+3. Update the version in pathcov's `pom.xml`
+4. The container also needs the updated JAR — ask the user to install it inside the container
+
+### Bytecode vs source-level semantics
+
+SootUp Jimple re-negates bytecode `if` conditions back to source-level semantics. IntelliJ coverage data uses bytecode-level semantics. This means `JumpDTO.trueBranch` (bytecode jump taken) corresponds to SootUp's **false** branch, and vice versa. See `CHANGELOG/2026-03-21-edge-coverage-in-block-map.md` for full details.
 
 ## Improvements
 
