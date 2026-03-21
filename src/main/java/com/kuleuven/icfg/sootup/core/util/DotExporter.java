@@ -29,6 +29,7 @@ import java.util.*;
 import com.kuleuven.blockmap.MethodBlockMap;
 import com.kuleuven.blockmap.hash.BlockHashBuilder;
 import com.kuleuven.blockmap.model.BlockDataDTO;
+import com.kuleuven.blockmap.model.EdgeCoverageDTO;
 import com.kuleuven.coverage.model.LineDTO;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
@@ -92,10 +93,11 @@ public class DotExporter {
             BlockHashBuilder blockHashBuilder = new BlockHashBuilder(block);
             String blockHash = blockHashBuilder.build();
 
+            BlockDataDTO blockData = null;
             StringBuilder coverageLabelSb = new StringBuilder();
             StringBuilder coverageStyleSb = new StringBuilder();
             if (methodBlockMap != null) {
-                BlockDataDTO blockData = methodBlockMap.getBlockDataByHash(blockHash);
+                blockData = methodBlockMap.getBlockDataByHash(blockHash);
                 CoverageType blockCoverageType = getBlockCoverageType(blockData);
                 coverageLabelSb
                         .append("\t\tlabel = \"").append(getBlockLabel(blockData)).append("\"\n");
@@ -181,6 +183,7 @@ public class DotExporter {
                     labelIt = Collections.emptyIterator();
                 }
 
+                int successorIndex = 0;
                 for (BasicBlock<?> successorBlock : successors) {
                     sb.append("\t").append(tailStmt.hashCode());
                     final boolean successorIsAlreadyDrawn = drawnBlocks.contains(successorBlock);
@@ -191,16 +194,22 @@ public class DotExporter {
                     }
                     sb.append(successorBlock.getHead().hashCode()).append(":n");
 
-                    if (labelIt.hasNext()) {
+                    String edgeColor = getEdgeColor(blockData, successorIndex);
+                    boolean hasLabel = labelIt.hasNext();
+                    if (hasLabel || edgeColor != null) {
                         sb.append("[");
-                        if (labelIt.hasNext()) {
+                        if (hasLabel) {
                             sb.append("label=\"").append(labelIt.next()).append("\"");
+                        }
+                        if (edgeColor != null) {
+                            if (hasLabel) sb.append(",");
+                            sb.append("color=\"").append(edgeColor).append("\"");
+                            sb.append(",fontcolor=\"").append(edgeColor).append("\"");
                         }
                         sb.append("]");
                     }
-                    //          sb.append("ltail=\"cluster_").append(block.hashCode()).append("\",
-                    // lhead=\"cluster_").append(successorBlock.hashCode()).append("\"]");
                     sb.append("\n");
+                    successorIndex++;
                 }
             }
 
@@ -316,6 +325,28 @@ public class DotExporter {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the edge color based on the edge's coverage hits, or null if no coverage data.
+     * Edges list in BlockDataDTO is ordered by successor index, matching block.getSuccessors().
+     */
+    private static @Nullable String getEdgeColor(@Nullable BlockDataDTO blockData, int successorIndex) {
+        if (blockData == null || blockData.edges == null || blockData.edges.isEmpty()) {
+            return null;
+        }
+        if (successorIndex >= blockData.edges.size()) {
+            return null;
+        }
+
+        EdgeCoverageDTO edge = blockData.edges.get(successorIndex);
+        if (edge.hits < 0) {
+            return "gray";
+        } else if (edge.hits == 0) {
+            return "lightcoral";
+        } else {
+            return "palegreen3";
+        }
     }
 
     private static String getBlockColor(CoverageType coverageType) {
