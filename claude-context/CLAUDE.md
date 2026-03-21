@@ -26,6 +26,8 @@ The project uses Maven as build tool, and for production we bake the dependencie
 
 In the `/Users/yoran.mertens/dev/master-thesis/suts` folder are programs I do testing on. When working on a feature. You can ask me to setup a dev program to test the feature. Then you can confirm your changes are working correctly by testing it on that dev program.
 
+> We moved to ICFG, away from CFG. It could be that we use some methods from the cfg package. But you should not make any updates to the cfg part of the pathcov project. 
+
 ## Improvements
 
 In the JDart pipeline I would like a more refined coverage heuristic, I get the coverage data from the pathcov pipeline. The coverage data I generate is based on the CFG. So currently we mark only the CFG blocks (nodes) as
