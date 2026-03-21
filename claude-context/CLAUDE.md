@@ -26,7 +26,7 @@ The project uses Maven as build tool, and for production we bake the dependencie
 
 In the `/Users/yoran.mertens/dev/master-thesis/suts` folder are programs I do testing on. When working on a feature. You can ask me to setup a dev program to test the feature. Then you can confirm your changes are working correctly by testing it on that dev program.
 
-> We moved to ICFG, away from CFG. It could be that we use some methods from the cfg package. But you should not make any updates to the cfg part of the pathcov project.
+**The `com.kuleuven.cfg` package is deprecated.** We moved to the `com.kuleuven.icfg` package which handles both single-method and interprocedural CFGs. The cfg package is self-contained — no code outside it depends on it. Do not add features or fixes to it.
 
 ### Running the pipeline
 
