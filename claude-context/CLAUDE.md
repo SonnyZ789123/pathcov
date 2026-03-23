@@ -49,6 +49,15 @@ The intellij-coverage-model is a shared dependency between pathcov and JDart. Wh
 3. Update the version in pathcov's `pom.xml`
 4. The container also needs the updated JAR — ask the user to install it inside the container
 
+### Releasing
+
+When the task/epic is finished (after user confirms):
+1. Increment the version in `pom.xml` (minor for features, patch for fixes)
+2. Commit the version bump and tag it: `git tag v<version>`
+3. Push commits and tags: `git push && git push --tags`
+4. Build the shaded JAR: `mvn install`
+5. Create a GitHub release with the shaded JAR attached: `gh release create v<version> target/pathcov-<version>.jar --title "pathcov <version>" --notes "..."`
+
 ### Bytecode vs source-level semantics
 
 SootUp Jimple re-negates bytecode `if` conditions back to source-level semantics. IntelliJ coverage data uses bytecode-level semantics. This means `JumpDTO.trueBranch` (bytecode jump taken) corresponds to SootUp's **false** branch, and vice versa. See `CHANGELOG/2026-03-21-edge-coverage-in-block-map.md` for full details.
